@@ -51,40 +51,31 @@ struct SeatAssignmentView: View {
                     } else {
                         ScrollView {
                             VStack(spacing: 20) {
+                                // Bilgi Notu
+                                HStack(spacing: 12) {
+                                    Image(systemName: "info.circle.fill")
+                                        .foregroundColor(BusTheme.accentBlue)
+                                    Text("Koltuk numarasına tıklayarak durak seçin. Uzun basarak dolu/boş yapın.")
+                                        .font(.subheadline)
+                                        .foregroundColor(BusTheme.textSecondary)
+                                }
+                                .padding()
+                                .background(BusTheme.accentBlue.opacity(0.1))
+                                .cornerRadius(12)
+                                .padding(.horizontal)
+                                
                                 // Otobüs Görseli
                                 BusSeatLayoutView(
                                     trip: trip,
                                     stops: trip.stops,
                                     onSeatTap: { seat in
-                                        viewModel.toggleSeatOccupation(seat)
-                                    },
-                                    onSeatLongPress: { seat in
                                         selectedSeatForStop = seat
                                         showingStopSelection = true
+                                    },
+                                    onSeatLongPress: { seat in
+                                        viewModel.toggleSeatOccupation(seat)
                                     }
                                 )
-                                
-                                // Koltuk Detayları ve Durak Seçimi
-                                VStack(alignment: .leading, spacing: 16) {
-                                    BusSectionHeader(title: "Koltuk Detayları", icon: "list.bullet")
-                                    
-                                    LazyVStack(spacing: 12) {
-                                        ForEach(trip.seats.sorted(by: { $0.number < $1.number })) { seat in
-                                            SeatRow(
-                                                seat: seat,
-                                                stops: trip.stops,
-                                                onStopChange: { stopId in
-                                                    viewModel.updateSeat(seat, stopId: stopId)
-                                                },
-                                                onToggleOccupation: {
-                                                    viewModel.toggleSeatOccupation(seat)
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                                .busCard()
-                                .padding(.horizontal)
                             }
                             .padding(.vertical)
                         }
