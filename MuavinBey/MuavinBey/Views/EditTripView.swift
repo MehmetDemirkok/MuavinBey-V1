@@ -264,6 +264,7 @@ struct EditTripView: View {
     }
     
     private var isFormValid: Bool {
+        !vehiclePlate.isEmpty &&
         !seatCount.isEmpty &&
         !routeStart.isEmpty &&
         !routeEnd.isEmpty &&
