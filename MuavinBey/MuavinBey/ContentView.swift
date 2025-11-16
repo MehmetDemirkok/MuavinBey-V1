@@ -22,11 +22,6 @@ struct ContentView: View {
                     Label("Yeni Sefer", systemImage: "plus.circle.fill")
                 }
             
-            SeatAssignmentView(viewModel: tripViewModel)
-                .tabItem {
-                    Label("Koltuklar", systemImage: "seat.fill")
-                }
-            
             TripSummaryView(viewModel: tripViewModel)
                 .tabItem {
                     Label("Özet", systemImage: "chart.bar.fill")

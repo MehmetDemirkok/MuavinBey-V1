@@ -1,0 +1,208 @@
+import SwiftUI
+
+struct TripDetailView: View {
+    let trip: Trip
+    @ObservedObject var viewModel: TripViewModel
+    @State private var selectedSeatForStop: Seat?
+    @State private var showingStopSelection = false
+    @Environment(\.dismiss) var dismiss
+    
+    // Seferin güncel halini almak için
+    private var currentTrip: Trip? {
+        viewModel.allTrips.first { $0.id == trip.id }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                // Background Gradient
+                LinearGradient(
+                    colors: [BusTheme.backgroundLight, BusTheme.accentBlue.opacity(0.05)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                
+                if let trip = currentTrip {
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            // Sefer Bilgileri Card
+                            VStack(alignment: .leading, spacing: 16) {
+                                BusSectionHeader(title: "Sefer Bilgileri", icon: "info.circle.fill")
+                                
+                                VStack(spacing: 12) {
+                                    InfoRow(icon: "numberplate", title: "Araç Plakası", value: trip.vehiclePlate)
+                                    InfoRow(icon: "mappin.circle.fill", title: "Güzergah", value: trip.routeDescription)
+                                    InfoRow(icon: "clock.fill", title: "Sefer Saati", value: trip.tripTime.isEmpty ? "Belirtilmemiş" : trip.tripTime)
+                                    InfoRow(icon: "seat.fill", title: "Koltuk Sayısı", value: "\(trip.seatCount) (\(trip.seatLayout))")
+                                    InfoRow(icon: "mappin.circle", title: "Durak Sayısı", value: "\(trip.stops.count)")
+                                    InfoRow(icon: "person.fill", title: "Dolu Koltuk", value: "\(trip.occupiedSeatsCount)")
+                                }
+                            }
+                            .busCard()
+                            .padding(.horizontal)
+                            .padding(.top)
+                            
+                            // Koltuk Yönetimi
+                            if trip.stops.isEmpty {
+                                VStack(spacing: 24) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [BusTheme.accentBlue.opacity(0.2), BusTheme.accentBlue.opacity(0.1)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .frame(width: 120, height: 120)
+                                        
+                                        Image(systemName: "mappin.circle")
+                                            .font(.system(size: 60))
+                                            .foregroundColor(BusTheme.accentBlue)
+                                    }
+                                    
+                                    Text("Önce durak ekleyin")
+                                        .font(.title3)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(BusTheme.textPrimary)
+                                    
+                                    Text("Koltuklara durak atamak için önce sefer düzenleme ekranından durak ekleyin")
+                                        .font(.subheadline)
+                                        .foregroundColor(BusTheme.textSecondary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 40)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                            } else {
+                                VStack(alignment: .leading, spacing: 16) {
+                                    BusSectionHeader(title: "Koltuk Planlaması", icon: "seat.fill")
+                                    
+                                    // Bilgi Notu
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "info.circle.fill")
+                                            .foregroundColor(BusTheme.accentBlue)
+                                        Text("Koltuk numarasına tıklayarak durak seçin. Uzun basarak dolu/boş yapın.")
+                                            .font(.subheadline)
+                                            .foregroundColor(BusTheme.textSecondary)
+                                    }
+                                    .padding()
+                                    .background(BusTheme.accentBlue.opacity(0.1))
+                                    .cornerRadius(12)
+                                    
+                                    // Otobüs Görseli
+                                    BusSeatLayoutView(
+                                        trip: trip,
+                                        stops: trip.stops,
+                                        onSeatTap: { seat in
+                                            selectedSeatForStop = seat
+                                            showingStopSelection = true
+                                        },
+                                        onSeatLongPress: { seat in
+                                            updateSeatOccupation(seat)
+                                        }
+                                    )
+                                }
+                                .busCard()
+                                .padding(.horizontal)
+                            }
+                        }
+                        .padding(.bottom, 30)
+                    }
+                } else {
+                    VStack(spacing: 24) {
+                        ZStack {
+                            Circle()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [BusTheme.warningYellow.opacity(0.2), BusTheme.warningYellow.opacity(0.1)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 120, height: 120)
+                            
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 60))
+                                .foregroundColor(BusTheme.warningYellow)
+                        }
+                        
+                        Text("Sefer bulunamadı")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .foregroundColor(BusTheme.textPrimary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            .navigationTitle("Sefer Detayı")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Geri") {
+                        dismiss()
+                    }
+                    .tint(BusTheme.primaryBlue)
+                }
+            }
+            .sheet(isPresented: $showingStopSelection) {
+                if let seat = selectedSeatForStop,
+                   let trip = currentTrip {
+                    StopSelectionSheet(
+                        seat: seat,
+                        stops: trip.stops,
+                        selectedStopId: seat.stopId,
+                        onSelect: { stopId in
+                            updateSeat(seat, stopId: stopId)
+                            showingStopSelection = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+    
+    // MARK: - Helper Functions
+    private func updateSeat(_ seat: Seat, stopId: UUID?) {
+        guard var trip = currentTrip else { return }
+        
+        if let index = trip.seats.firstIndex(where: { $0.id == seat.id }) {
+            trip.seats[index].stopId = stopId
+            viewModel.updateTrip(trip)
+        }
+    }
+    
+    private func updateSeatOccupation(_ seat: Seat) {
+        guard var trip = currentTrip else { return }
+        
+        if let index = trip.seats.firstIndex(where: { $0.id == seat.id }) {
+            trip.seats[index].isOccupied.toggle()
+            viewModel.updateTrip(trip)
+        }
+    }
+}
+
+struct InfoRow: View {
+    let icon: String
+    let title: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundColor(BusTheme.primaryBlue)
+                .frame(width: 24)
+            Text(title)
+                .foregroundColor(BusTheme.textSecondary)
+            Spacer()
+            Text(value)
+                .foregroundColor(BusTheme.textPrimary)
+                .fontWeight(.medium)
+        }
+        .padding()
+        .background(BusTheme.backgroundCard)
+        .cornerRadius(12)
+    }
+}
+

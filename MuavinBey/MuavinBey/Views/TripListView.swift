@@ -54,6 +54,7 @@ struct TripListView: View {
                                 TripCard(
                                     trip: trip,
                                     isSelected: viewModel.currentTrip?.id == trip.id,
+                                    navigationDestination: TripDetailView(trip: trip, viewModel: viewModel),
                                     onSelect: {
                                         viewModel.selectTrip(trip)
                                     },
@@ -102,6 +103,7 @@ struct TripListView: View {
 struct TripCard: View {
     let trip: Trip
     let isSelected: Bool
+    let navigationDestination: TripDetailView
     let onSelect: () -> Void
     let onEdit: () -> Void
     let onDelete: () -> Void
@@ -109,75 +111,84 @@ struct TripCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Image(systemName: "numberplate")
-                            .foregroundColor(BusTheme.primaryBlue)
-                        Text(trip.vehiclePlate)
-                            .font(.headline)
-                            .foregroundColor(BusTheme.textPrimary)
-                    }
-                    
-                    HStack {
-                        Image(systemName: "mappin.circle.fill")
-                            .foregroundColor(BusTheme.primaryOrange)
-                            .font(.caption)
-                        Text(trip.routeDescription)
-                            .font(.subheadline)
-                            .foregroundColor(BusTheme.textSecondary)
-                    }
-                    
-                    HStack(spacing: 16) {
-                        Label("\(trip.seatCount) koltuk", systemImage: "seat.fill")
-                            .font(.caption)
-                            .foregroundColor(BusTheme.textSecondary)
+            // Tıklanabilir üst kısım - NavigationLink
+            NavigationLink(destination: navigationDestination) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "numberplate")
+                                .foregroundColor(BusTheme.primaryBlue)
+                            Text(trip.vehiclePlate)
+                                .font(.headline)
+                                .foregroundColor(BusTheme.textPrimary)
+                        }
                         
-                        Label(trip.seatLayout, systemImage: "rectangle.grid.2x2")
-                            .font(.caption)
-                            .foregroundColor(BusTheme.textSecondary)
-                        
-                        Label("\(trip.stops.count) durak", systemImage: "mappin.circle")
-                            .font(.caption)
-                            .foregroundColor(BusTheme.textSecondary)
-                    }
-                    
-                    HStack(spacing: 12) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "calendar")
-                                .foregroundColor(BusTheme.accentBlue)
+                        HStack {
+                            Image(systemName: "mappin.circle.fill")
+                                .foregroundColor(BusTheme.primaryOrange)
                                 .font(.caption)
-                            Text(trip.shortDate)
+                            Text(trip.routeDescription)
+                                .font(.subheadline)
+                                .foregroundColor(BusTheme.textSecondary)
+                        }
+                        
+                        HStack(spacing: 16) {
+                            Label("\(trip.seatCount) koltuk", systemImage: "seat.fill")
+                                .font(.caption)
+                                .foregroundColor(BusTheme.textSecondary)
+                            
+                            Label(trip.seatLayout, systemImage: "rectangle.grid.2x2")
+                                .font(.caption)
+                                .foregroundColor(BusTheme.textSecondary)
+                            
+                            Label("\(trip.stops.count) durak", systemImage: "mappin.circle")
                                 .font(.caption)
                                 .foregroundColor(BusTheme.textSecondary)
                         }
                         
-                        if !trip.tripTime.isEmpty {
+                        HStack(spacing: 12) {
                             HStack(spacing: 4) {
-                                Image(systemName: "clock.fill")
-                                    .foregroundColor(BusTheme.primaryOrange)
+                                Image(systemName: "calendar")
+                                    .foregroundColor(BusTheme.accentBlue)
                                     .font(.caption)
-                                Text(trip.tripTime)
+                                Text(trip.shortDate)
                                     .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(BusTheme.primaryOrange)
+                                    .foregroundColor(BusTheme.textSecondary)
+                            }
+                            
+                            if !trip.tripTime.isEmpty {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "clock.fill")
+                                        .foregroundColor(BusTheme.primaryOrange)
+                                        .font(.caption)
+                                    Text(trip.tripTime)
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(BusTheme.primaryOrange)
+                                }
                             }
                         }
+                        .padding(.top, 4)
                     }
-                    .padding(.top, 4)
-                }
-                
-                Spacer()
-                
-                if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(BusTheme.successGreen)
-                        .font(.title2)
+                    
+                    Spacer()
+                    
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(BusTheme.successGreen)
+                            .font(.title2)
+                    }
+                    
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(BusTheme.textSecondary)
+                        .font(.caption)
                 }
             }
+            .buttonStyle(.plain)
             
             Divider()
             
+            // Butonlar - NavigationLink dışında
             HStack(spacing: 12) {
                 Button(action: onSelect) {
                     HStack {
