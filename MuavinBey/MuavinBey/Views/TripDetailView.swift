@@ -190,14 +190,6 @@ struct TripDetailView: View {
             }
             .navigationTitle("Sefer Detayı")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Geri") {
-                        dismiss()
-                    }
-                    .tint(BusTheme.primaryBlue)
-                }
-            }
             .sheet(isPresented: $showingStopSelection) {
                 if let seat = selectedSeatForStop,
                    let trip = currentTrip {
