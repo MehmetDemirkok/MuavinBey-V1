@@ -219,11 +219,22 @@ struct TripDetailView: View {
     
     // MARK: - Helper Functions
     private func updateSeat(_ seat: Seat, stopId: UUID?) {
-        guard var trip = currentTrip else { return }
+        guard let trip = currentTrip else { return }
         
-        if let index = trip.seats.firstIndex(where: { $0.id == seat.id }) {
-            trip.seats[index].stopId = stopId
-            viewModel.updateTrip(trip)
+        // ViewModel'deki updateSeat fonksiyonunu kullan
+        // Bu fonksiyon hem stopId'yi hem de isOccupied'ı günceller
+        // Ancak currentTrip'i güncellemek için trip'i de güncellememiz gerekiyor
+        var updatedTrip = trip
+        if let index = updatedTrip.seats.firstIndex(where: { $0.id == seat.id }) {
+            updatedTrip.seats[index].stopId = stopId
+            // Durak atandığında otomatik olarak dolu yap
+            if stopId != nil {
+                updatedTrip.seats[index].isOccupied = true
+            } else {
+                // Durak kaldırıldığında boş yap
+                updatedTrip.seats[index].isOccupied = false
+            }
+            viewModel.updateTrip(updatedTrip)
         }
     }
     

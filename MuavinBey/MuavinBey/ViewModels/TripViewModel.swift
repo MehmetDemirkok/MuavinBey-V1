@@ -172,6 +172,13 @@ class TripViewModel: ObservableObject {
         guard var trip = currentTrip else { return }
         if let index = trip.seats.firstIndex(where: { $0.id == seat.id }) {
             trip.seats[index].stopId = stopId
+            // Durak atandığında otomatik olarak dolu yap
+            if stopId != nil {
+                trip.seats[index].isOccupied = true
+            } else {
+                // Durak kaldırıldığında boş yap
+                trip.seats[index].isOccupied = false
+            }
         }
         currentTrip = trip
         saveCurrentTrip()
