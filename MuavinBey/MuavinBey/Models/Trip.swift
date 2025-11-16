@@ -7,6 +7,7 @@ struct Trip: Identifiable, Codable {
     var seatCount: Int
     var routeStart: String
     var routeEnd: String
+    var tripTime: String  // Sefer saati (örn: "14:30")
     var stops: [Stop]
     var seats: [Seat]
     var createdAt: Date
@@ -18,6 +19,7 @@ struct Trip: Identifiable, Codable {
         seatCount: Int,
         routeStart: String,
         routeEnd: String,
+        tripTime: String = "",
         stops: [Stop] = [],
         seats: [Seat] = [],
         createdAt: Date = Date()
@@ -28,6 +30,7 @@ struct Trip: Identifiable, Codable {
         self.seatCount = seatCount
         self.routeStart = routeStart
         self.routeEnd = routeEnd
+        self.tripTime = tripTime
         self.stops = stops
         self.seats = seats
         self.createdAt = createdAt

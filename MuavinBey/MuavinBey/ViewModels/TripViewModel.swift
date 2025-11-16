@@ -23,6 +23,7 @@ class TripViewModel: ObservableObject {
         seatCount: Int,
         routeStart: String,
         routeEnd: String,
+        tripTime: String,
         stops: [Stop] = []
     ) {
         let seats = (1...seatCount).map { Seat(number: $0) }
@@ -33,6 +34,7 @@ class TripViewModel: ObservableObject {
             seatCount: seatCount,
             routeStart: routeStart,
             routeEnd: routeEnd,
+            tripTime: tripTime,
             stops: stops,
             seats: seats,
             createdAt: Date()
@@ -72,6 +74,7 @@ class TripViewModel: ObservableObject {
             seatCount: trip.seatCount,
             routeStart: trip.routeStart,
             routeEnd: trip.routeEnd,
+            tripTime: trip.tripTime,
             stops: trip.stops,
             seats: trip.seats.map { Seat(number: $0.number, stopId: $0.stopId, isOccupied: false) },
             createdAt: Date()

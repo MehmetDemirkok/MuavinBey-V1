@@ -24,7 +24,8 @@ struct ContentView: View {
             
             SeatAssignmentView(viewModel: tripViewModel)
                 .tabItem {
-                    Label("Koltuklar", systemImage: "seat.fill")
+                    Image(systemName: "seat.fill")
+                    Text("Koltuklar")
                 }
             
             TripSummaryView(viewModel: tripViewModel)

@@ -142,13 +142,27 @@ struct TripCard: View {
                             .foregroundColor(BusTheme.textSecondary)
                     }
                     
-                    HStack {
-                        Image(systemName: "calendar")
-                            .foregroundColor(BusTheme.accentBlue)
-                            .font(.caption)
-                        Text(trip.formattedDate)
-                            .font(.caption)
-                            .foregroundColor(BusTheme.textSecondary)
+                    HStack(spacing: 12) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "calendar")
+                                .foregroundColor(BusTheme.accentBlue)
+                                .font(.caption)
+                            Text(trip.shortDate)
+                                .font(.caption)
+                                .foregroundColor(BusTheme.textSecondary)
+                        }
+                        
+                        if !trip.tripTime.isEmpty {
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock.fill")
+                                    .foregroundColor(BusTheme.primaryOrange)
+                                    .font(.caption)
+                                Text(trip.tripTime)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(BusTheme.primaryOrange)
+                            }
+                        }
                     }
                     .padding(.top, 4)
                 }

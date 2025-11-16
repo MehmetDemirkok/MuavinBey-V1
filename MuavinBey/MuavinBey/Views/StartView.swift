@@ -8,6 +8,7 @@ struct StartView: View {
     @State private var seatCount = ""
     @State private var routeStart = ""
     @State private var routeEnd = ""
+    @State private var tripTime = ""
     @State private var showingError = false
     @State private var showingSuccess = false
     @State private var errorMessage = ""
@@ -165,6 +166,33 @@ struct StartView: View {
                         .busCard()
                         .padding(.horizontal)
                         
+                        // Sefer Saati Card
+                        VStack(alignment: .leading, spacing: 16) {
+                            BusSectionHeader(title: "Sefer Saati", icon: "clock.fill")
+                            
+                            HStack {
+                                Image(systemName: "clock.fill")
+                                    .foregroundColor(BusTheme.primaryOrange)
+                                    .frame(width: 24)
+                                Text("Kalkış Saati")
+                                    .foregroundColor(BusTheme.textSecondary)
+                                Spacer()
+                                TextField("Örn: 14:30", text: $tripTime)
+                                    .multilineTextAlignment(.trailing)
+                                    .frame(width: 120)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(BusTheme.primaryOrange.opacity(0.1))
+                                    .cornerRadius(8)
+                                    .keyboardType(.numbersAndPunctuation)
+                            }
+                            .padding()
+                            .background(BusTheme.backgroundCard)
+                            .cornerRadius(12)
+                        }
+                        .busCard()
+                        .padding(.horizontal)
+                        
                         // Duraklar Card
                         VStack(alignment: .leading, spacing: 16) {
                             BusSectionHeader(title: "Duraklar (Opsiyonel)", icon: "mappin.circle.fill")
@@ -291,6 +319,7 @@ struct StartView: View {
             seatCount: count,
             routeStart: routeStart.trimmingCharacters(in: .whitespaces),
             routeEnd: routeEnd.trimmingCharacters(in: .whitespaces),
+            tripTime: tripTime.trimmingCharacters(in: .whitespaces),
             stops: stops
         )
         

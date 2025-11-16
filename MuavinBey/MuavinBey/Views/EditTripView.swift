@@ -10,6 +10,7 @@ struct EditTripView: View {
     @State private var seatCount: String
     @State private var routeStart: String
     @State private var routeEnd: String
+    @State private var tripTime: String
     @State private var stops: [Stop]
     @State private var newStopName = ""
     @State private var showingAddStop = false
@@ -29,6 +30,7 @@ struct EditTripView: View {
         _seatCount = State(initialValue: "\(trip.seatCount)")
         _routeStart = State(initialValue: trip.routeStart)
         _routeEnd = State(initialValue: trip.routeEnd)
+        _tripTime = State(initialValue: trip.tripTime)
         _stops = State(initialValue: trip.stops)
     }
     
@@ -172,6 +174,33 @@ struct EditTripView: View {
                         .busCard()
                         .padding(.horizontal)
                         
+                        // Sefer Saati
+                        VStack(alignment: .leading, spacing: 16) {
+                            BusSectionHeader(title: "Sefer Saati", icon: "clock.fill")
+                            
+                            HStack {
+                                Image(systemName: "clock.fill")
+                                    .foregroundColor(BusTheme.primaryOrange)
+                                    .frame(width: 24)
+                                Text("Kalkış Saati")
+                                    .foregroundColor(BusTheme.textSecondary)
+                                Spacer()
+                                TextField("Örn: 14:30", text: $tripTime)
+                                    .multilineTextAlignment(.trailing)
+                                    .frame(width: 120)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(BusTheme.primaryOrange.opacity(0.1))
+                                    .cornerRadius(8)
+                                    .keyboardType(.numbersAndPunctuation)
+                            }
+                            .padding()
+                            .background(BusTheme.backgroundCard)
+                            .cornerRadius(12)
+                        }
+                        .busCard()
+                        .padding(.horizontal)
+                        
                         // Duraklar
                         VStack(alignment: .leading, spacing: 16) {
                             BusSectionHeader(title: "Duraklar", icon: "mappin.circle.fill")
@@ -305,6 +334,7 @@ struct EditTripView: View {
         updatedTrip.seatCount = count
         updatedTrip.routeStart = routeStart.trimmingCharacters(in: .whitespaces)
         updatedTrip.routeEnd = routeEnd.trimmingCharacters(in: .whitespaces)
+        updatedTrip.tripTime = tripTime.trimmingCharacters(in: .whitespaces)
         updatedTrip.stops = stops
         
         // Koltuk sayısı değiştiyse güncelle

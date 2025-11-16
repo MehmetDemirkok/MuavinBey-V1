@@ -75,6 +75,15 @@ struct TripSummaryView: View {
                                         value: trip.routeDescription,
                                         color: BusTheme.successGreen
                                     )
+                                    
+                                    if !trip.tripTime.isEmpty {
+                                        InfoCard(
+                                            icon: "clock.fill",
+                                            title: "Kalkış Saati",
+                                            value: trip.tripTime,
+                                            color: BusTheme.primaryOrange
+                                        )
+                                    }
                                 }
                             }
                             .busCard()
