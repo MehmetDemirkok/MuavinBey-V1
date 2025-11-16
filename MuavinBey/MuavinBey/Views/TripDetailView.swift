@@ -84,10 +84,10 @@ struct TripDetailView: View {
                                 BusSectionHeader(title: "Sefer Bilgileri", icon: "info.circle.fill")
                                 
                                 VStack(spacing: 12) {
-                                    InfoRow(icon: "numberplate", title: "Araç Plakası", value: trip.vehiclePlate)
+                                    InfoRow(icon: "car.fill", title: "Araç Plakası", value: trip.vehiclePlate)
                                     InfoRow(icon: "mappin.circle.fill", title: "Güzergah", value: trip.routeDescription)
                                     InfoRow(icon: "clock.fill", title: "Sefer Saati", value: trip.tripTime.isEmpty ? "Belirtilmemiş" : trip.tripTime)
-                                    InfoRow(icon: "seat.fill", title: "Koltuk Sayısı", value: "\(trip.seatCount) (\(trip.seatLayout))")
+                                    InfoRow(icon: "chair.fill", title: "Koltuk Sayısı", value: "\(trip.seatCount) (\(trip.seatLayout))")
                                     InfoRow(icon: "mappin.circle", title: "Durak Sayısı", value: "\(trip.stops.count)")
                                     InfoRow(icon: "person.fill", title: "Dolu Koltuk", value: "\(trip.occupiedSeatsCount)")
                                 }
@@ -129,7 +129,7 @@ struct TripDetailView: View {
                                 .padding(.vertical, 40)
                             } else {
                                 VStack(alignment: .leading, spacing: 16) {
-                                    BusSectionHeader(title: "Koltuk Planlaması", icon: "seat.fill")
+                                    BusSectionHeader(title: "Koltuk Planlaması", icon: "chair.fill")
                                     
                                     // Bilgi Notu
                                     HStack(spacing: 12) {

@@ -64,7 +64,7 @@ struct StartView: View {
                             VStack(spacing: 16) {
                                 // Araç Plakası
                                 HStack {
-                                    Image(systemName: "numberplate")
+                                    Image(systemName: "car.fill")
                                         .foregroundColor(BusTheme.primaryBlue)
                                         .frame(width: 24)
                                     Text("Araç Plakası")

@@ -116,7 +116,7 @@ struct TripCard: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Image(systemName: "numberplate")
+                            Image(systemName: "car.fill")
                                 .foregroundColor(BusTheme.primaryBlue)
                             Text(trip.vehiclePlate)
                                 .font(.headline)
@@ -133,7 +133,7 @@ struct TripCard: View {
                         }
                         
                         HStack(spacing: 16) {
-                            Label("\(trip.seatCount) koltuk", systemImage: "seat.fill")
+                            Label("\(trip.seatCount) koltuk", systemImage: "chair.fill")
                                 .font(.caption)
                                 .foregroundColor(BusTheme.textSecondary)
                             
