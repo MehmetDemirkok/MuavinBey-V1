@@ -21,11 +21,6 @@ struct ContentView: View {
                 .tabItem {
                     Label("Yeni Sefer", systemImage: "plus.circle.fill")
                 }
-            
-            TripSummaryView(viewModel: tripViewModel)
-                .tabItem {
-                    Label("Özet", systemImage: "chart.bar.fill")
-                }
         }
         .tint(BusTheme.primaryBlue)
     }
