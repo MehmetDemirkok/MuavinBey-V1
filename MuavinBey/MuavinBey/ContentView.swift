@@ -12,6 +12,11 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
+            TripListView(viewModel: tripViewModel)
+                .tabItem {
+                    Label("Seferler", systemImage: "list.bullet.rectangle")
+                }
+            
             StartView(viewModel: tripViewModel)
                 .tabItem {
                     Label("Yeni Sefer", systemImage: "plus.circle.fill")

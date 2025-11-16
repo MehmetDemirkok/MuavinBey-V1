@@ -1,29 +1,43 @@
 import SwiftUI
 import UIKit
 
-struct StartView: View {
+struct EditTripView: View {
     @ObservedObject var viewModel: TripViewModel
-    @State private var vehicleType = "Otobüs"
-    @State private var seatLayout = "2+1"
-    @State private var seatCount = ""
-    @State private var routeStart = ""
-    @State private var routeEnd = ""
-    @State private var showingError = false
-    @State private var showingSuccess = false
-    @State private var errorMessage = ""
-    @State private var stops: [Stop] = []
+    let trip: Trip
+    
+    @State private var vehicleType: String
+    @State private var seatLayout: String
+    @State private var seatCount: String
+    @State private var routeStart: String
+    @State private var routeEnd: String
+    @State private var stops: [Stop]
     @State private var newStopName = ""
     @State private var showingAddStop = false
+    @State private var showingError = false
+    @State private var errorMessage = ""
+    @State private var showingSuccess = false
+    
+    @Environment(\.dismiss) var dismiss
     
     let vehicleTypes = ["Otobüs", "Midibüs", "Minibüs"]
     let seatLayouts = ["2+1", "2+2"]
     
+    init(viewModel: TripViewModel, trip: Trip) {
+        self.viewModel = viewModel
+        self.trip = trip
+        _vehicleType = State(initialValue: trip.vehicleType)
+        _seatLayout = State(initialValue: trip.seatLayout)
+        _seatCount = State(initialValue: "\(trip.seatCount)")
+        _routeStart = State(initialValue: trip.routeStart)
+        _routeEnd = State(initialValue: trip.routeEnd)
+        _stops = State(initialValue: trip.stops)
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background Gradient
                 LinearGradient(
-                    colors: [BusTheme.backgroundLight, BusTheme.primaryBlue.opacity(0.05)],
+                    colors: [BusTheme.backgroundLight, BusTheme.primaryOrange.opacity(0.05)],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -31,38 +45,36 @@ struct StartView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Header Icon
                         VStack(spacing: 12) {
                             ZStack {
                                 Circle()
                                     .fill(
                                         LinearGradient(
-                                            colors: [BusTheme.primaryBlue, BusTheme.accentBlue],
+                                            colors: [BusTheme.primaryOrange, BusTheme.accentOrange],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         )
                                     )
                                     .frame(width: 80, height: 80)
-                                    .shadow(color: BusTheme.primaryBlue.opacity(0.3), radius: 12, x: 0, y: 6)
+                                    .shadow(color: BusTheme.primaryOrange.opacity(0.3), radius: 12, x: 0, y: 6)
                                 
-                                Image(systemName: "bus.fill")
+                                Image(systemName: "pencil.circle.fill")
                                     .font(.system(size: 40))
                                     .foregroundColor(.white)
                             }
                             
-                            Text("Yeni Sefer Oluştur")
+                            Text("Sefer Düzenle")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(BusTheme.textPrimary)
                         }
                         .padding(.top, 20)
                         
-                        // Araç Bilgileri Card
+                        // Araç Bilgileri
                         VStack(alignment: .leading, spacing: 16) {
                             BusSectionHeader(title: "Araç Bilgileri", icon: "car.fill")
                             
                             VStack(spacing: 16) {
-                                // Araç Tipi
                                 HStack {
                                     Image(systemName: "bus")
                                         .foregroundColor(BusTheme.primaryBlue)
@@ -82,7 +94,6 @@ struct StartView: View {
                                 .background(BusTheme.backgroundCard)
                                 .cornerRadius(12)
                                 
-                                // Koltuk Düzeni
                                 HStack {
                                     Image(systemName: "rectangle.grid.2x2")
                                         .foregroundColor(BusTheme.primaryOrange)
@@ -102,7 +113,6 @@ struct StartView: View {
                                 .background(BusTheme.backgroundCard)
                                 .cornerRadius(12)
                                 
-                                // Koltuk Sayısı
                                 HStack {
                                     Image(systemName: "number")
                                         .foregroundColor(BusTheme.accentBlue)
@@ -127,34 +137,31 @@ struct StartView: View {
                         .busCard()
                         .padding(.horizontal)
                         
-                        // Güzergah Card
+                        // Güzergah
                         VStack(alignment: .leading, spacing: 16) {
                             BusSectionHeader(title: "Güzergah", icon: "map.fill")
                             
                             VStack(spacing: 16) {
-                                // Başlangıç
                                 HStack {
                                     Image(systemName: "mappin.circle.fill")
                                         .foregroundColor(BusTheme.successGreen)
                                         .frame(width: 24)
-                                    TextField("Başlangıç (Örn: Ankara)", text: $routeStart)
+                                    TextField("Başlangıç", text: $routeStart)
                                         .textFieldStyle(.plain)
                                 }
                                 .padding()
                                 .background(BusTheme.backgroundCard)
                                 .cornerRadius(12)
                                 
-                                // Arrow
                                 Image(systemName: "arrow.down")
                                     .foregroundColor(BusTheme.primaryBlue)
                                     .font(.title3)
                                 
-                                // Bitiş
                                 HStack {
                                     Image(systemName: "mappin.circle.fill")
                                         .foregroundColor(BusTheme.errorRed)
                                         .frame(width: 24)
-                                    TextField("Bitiş (Örn: İstanbul)", text: $routeEnd)
+                                    TextField("Bitiş", text: $routeEnd)
                                         .textFieldStyle(.plain)
                                 }
                                 .padding()
@@ -165,9 +172,9 @@ struct StartView: View {
                         .busCard()
                         .padding(.horizontal)
                         
-                        // Duraklar Card
+                        // Duraklar
                         VStack(alignment: .leading, spacing: 16) {
-                            BusSectionHeader(title: "Duraklar (Opsiyonel)", icon: "mappin.circle.fill")
+                            BusSectionHeader(title: "Duraklar", icon: "mappin.circle.fill")
                             
                             if stops.isEmpty {
                                 Text("Henüz durak eklenmedi")
@@ -212,14 +219,13 @@ struct StartView: View {
                         .busCard()
                         .padding(.horizontal)
                         
-                        // Sefer Oluştur Button
                         Button(action: {
-                            createTrip()
+                            saveTrip()
                         }) {
                             HStack(spacing: 12) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(.title3)
-                                Text("Sefer Oluştur")
+                                Text("Kaydet")
                                     .fontWeight(.semibold)
                             }
                         }
@@ -229,97 +235,7 @@ struct StartView: View {
                     }
                 }
             }
-            .navigationTitle("Yeni Sefer")
-            .navigationBarTitleDisplayMode(.inline)
-            .alert("Hata", isPresented: $showingError) {
-                Button("Tamam", role: .cancel) { }
-            } message: {
-                Text(errorMessage)
-            }
-            .alert("Başarılı", isPresented: $showingSuccess) {
-                Button("Tamam", role: .cancel) { }
-            } message: {
-                Text("Sefer başarıyla oluşturuldu!")
-            }
-            .sheet(isPresented: $showingAddStop) {
-                AddStopSheetForStart(stopName: $newStopName, stops: $stops)
-            }
-        }
-    }
-}
-
-struct AddStopSheetForStart: View {
-    @Binding var stopName: String
-    @Binding var stops: [Stop]
-    @Environment(\.dismiss) var dismiss
-    @FocusState private var isTextFieldFocused: Bool
-    
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                LinearGradient(
-                    colors: [BusTheme.backgroundLight, BusTheme.primaryOrange.opacity(0.05)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                
-                VStack(spacing: 24) {
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [BusTheme.primaryOrange, BusTheme.accentOrange],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 80, height: 80)
-                            .shadow(color: BusTheme.primaryOrange.opacity(0.3), radius: 12, x: 0, y: 6)
-                        
-                        Image(systemName: "mappin.circle.fill")
-                            .font(.system(size: 40))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.top, 40)
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        BusSectionHeader(title: "Durak Adı", icon: "textformat")
-                        
-                        TextField("Örn: Esenler Otogar", text: $stopName)
-                            .focused($isTextFieldFocused)
-                            .padding()
-                            .background(BusTheme.backgroundCard)
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(BusTheme.primaryOrange.opacity(0.3), lineWidth: 1)
-                            )
-                    }
-                    .busCard()
-                    .padding(.horizontal)
-                    
-                    Button(action: {
-                        if !stopName.isEmpty {
-                            stops.append(Stop(name: stopName))
-                            stopName = ""
-                            dismiss()
-                        }
-                    }) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.title3)
-                            Text("Ekle")
-                                .fontWeight(.semibold)
-                        }
-                    }
-                    .buttonStyle(BusPrimaryButtonStyle(isEnabled: !stopName.isEmpty))
-                    .padding(.horizontal)
-                    
-                    Spacer()
-                }
-            }
-            .navigationTitle("Yeni Durak")
+            .navigationTitle("Sefer Düzenle")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -329,8 +245,20 @@ struct AddStopSheetForStart: View {
                     .tint(BusTheme.primaryBlue)
                 }
             }
-            .onAppear {
-                isTextFieldFocused = true
+            .alert("Hata", isPresented: $showingError) {
+                Button("Tamam", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
+            .alert("Başarılı", isPresented: $showingSuccess) {
+                Button("Tamam", role: .cancel) {
+                    dismiss()
+                }
+            } message: {
+                Text("Sefer başarıyla güncellendi!")
+            }
+            .sheet(isPresented: $showingAddStop) {
+                AddStopSheetForStart(stopName: $newStopName, stops: $stops)
             }
         }
     }
@@ -343,8 +271,7 @@ struct AddStopSheetForStart: View {
         Int(seatCount)! > 0
     }
     
-    private func createTrip() {
-        // Klavye'yi kapat
+    private func saveTrip() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         
         guard let count = Int(seatCount), count > 0 else {
@@ -365,23 +292,21 @@ struct AddStopSheetForStart: View {
             return
         }
         
-        // Sefer oluştur
-        viewModel.createTrip(
-            vehicleType: vehicleType,
-            seatLayout: seatLayout,
-            seatCount: count,
-            routeStart: routeStart.trimmingCharacters(in: .whitespaces),
-            routeEnd: routeEnd.trimmingCharacters(in: .whitespaces),
-            stops: stops
-        )
+        var updatedTrip = trip
+        updatedTrip.vehicleType = vehicleType
+        updatedTrip.seatLayout = seatLayout
+        updatedTrip.seatCount = count
+        updatedTrip.routeStart = routeStart.trimmingCharacters(in: .whitespaces)
+        updatedTrip.routeEnd = routeEnd.trimmingCharacters(in: .whitespaces)
+        updatedTrip.stops = stops
         
-        // Başarı mesajı göster
+        // Koltuk sayısı değiştiyse güncelle
+        if count != trip.seatCount {
+            updatedTrip.seats = (1...count).map { Seat(number: $0) }
+        }
+        
+        viewModel.updateTrip(updatedTrip)
         showingSuccess = true
-        
-        // Form'u temizle (opsiyonel - kullanıcı yeni sefer oluşturmak isteyebilir)
-        // seatCount = ""
-        // routeStart = ""
-        // routeEnd = ""
     }
 }
 

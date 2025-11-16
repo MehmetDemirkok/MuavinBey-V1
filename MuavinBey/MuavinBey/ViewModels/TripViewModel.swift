@@ -5,6 +5,7 @@ import Combine
 @MainActor
 class TripViewModel: ObservableObject {
     @Published var currentTrip: Trip?
+    @Published var allTrips: [Trip] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -12,6 +13,7 @@ class TripViewModel: ObservableObject {
     
     init() {
         loadCurrentTrip()
+        loadAllTrips()
     }
     
     // MARK: - Trip Management
@@ -20,7 +22,8 @@ class TripViewModel: ObservableObject {
         seatLayout: String,
         seatCount: Int,
         routeStart: String,
-        routeEnd: String
+        routeEnd: String,
+        stops: [Stop] = []
     ) {
         let seats = (1...seatCount).map { Seat(number: $0) }
         
@@ -30,17 +33,48 @@ class TripViewModel: ObservableObject {
             seatCount: seatCount,
             routeStart: routeStart,
             routeEnd: routeEnd,
-            stops: [],
+            stops: stops,
             seats: seats
         )
         
         currentTrip = trip
         saveCurrentTrip()
+        saveTripToList(trip)
     }
     
     func updateTrip(_ trip: Trip) {
         currentTrip = trip
         saveCurrentTrip()
+        updateTripInList(trip)
+    }
+    
+    func deleteTrip(_ trip: Trip) {
+        allTrips.removeAll { $0.id == trip.id }
+        saveAllTrips()
+        
+        if currentTrip?.id == trip.id {
+            currentTrip = nil
+            storage.clearCurrentTrip()
+        }
+    }
+    
+    func selectTrip(_ trip: Trip) {
+        currentTrip = trip
+        saveCurrentTrip()
+    }
+    
+    func duplicateTrip(_ trip: Trip) {
+        var newTrip = trip
+        newTrip = Trip(
+            vehicleType: trip.vehicleType,
+            seatLayout: trip.seatLayout,
+            seatCount: trip.seatCount,
+            routeStart: trip.routeStart,
+            routeEnd: trip.routeEnd,
+            stops: trip.stops,
+            seats: trip.seats.map { Seat(number: $0.number, stopId: $0.stopId, isOccupied: false) }
+        )
+        saveTripToList(newTrip)
     }
     
     // MARK: - Stop Management
@@ -116,6 +150,30 @@ class TripViewModel: ObservableObject {
     private func saveCurrentTrip() {
         if let trip = currentTrip {
             storage.saveCurrentTrip(trip)
+        }
+    }
+    
+    private func loadAllTrips() {
+        allTrips = storage.loadTrips()
+    }
+    
+    private func saveAllTrips() {
+        storage.saveTrips(allTrips)
+    }
+    
+    private func saveTripToList(_ trip: Trip) {
+        if !allTrips.contains(where: { $0.id == trip.id }) {
+            allTrips.append(trip)
+        }
+        saveAllTrips()
+    }
+    
+    private func updateTripInList(_ trip: Trip) {
+        if let index = allTrips.firstIndex(where: { $0.id == trip.id }) {
+            allTrips[index] = trip
+            saveAllTrips()
+        } else {
+            saveTripToList(trip)
         }
     }
 }
