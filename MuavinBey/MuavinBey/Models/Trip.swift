@@ -11,6 +11,8 @@ struct Trip: Identifiable, Codable {
     var stops: [Stop]
     var seats: [Seat]
     var createdAt: Date
+    var isActive: Bool  // Sefer aktif mi?
+    var visitedStops: [UUID]  // Ziyaret edilen duraklar
     
     init(
         id: UUID = UUID(),
@@ -22,7 +24,9 @@ struct Trip: Identifiable, Codable {
         tripTime: String = "",
         stops: [Stop] = [],
         seats: [Seat] = [],
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        isActive: Bool = false,
+        visitedStops: [UUID] = []
     ) {
         self.id = id
         self.vehiclePlate = vehiclePlate
@@ -34,6 +38,8 @@ struct Trip: Identifiable, Codable {
         self.stops = stops
         self.seats = seats
         self.createdAt = createdAt
+        self.isActive = isActive
+        self.visitedStops = visitedStops
     }
     
     // Computed properties
@@ -58,6 +64,16 @@ struct Trip: Identifiable, Codable {
         formatter.dateStyle = .short
         formatter.locale = Locale(identifier: "tr_TR")
         return formatter.string(from: createdAt)
+    }
+    
+    // Durak ziyaret edildi mi?
+    func isStopVisited(_ stopId: UUID) -> Bool {
+        visitedStops.contains(stopId)
+    }
+    
+    // Sonraki durak
+    var nextStop: Stop? {
+        stops.first { !visitedStops.contains($0.id) }
     }
 }
 

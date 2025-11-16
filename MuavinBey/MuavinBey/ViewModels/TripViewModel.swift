@@ -37,7 +37,9 @@ class TripViewModel: ObservableObject {
             tripTime: tripTime,
             stops: stops,
             seats: seats,
-            createdAt: Date()
+            createdAt: Date(),
+            isActive: false,
+            visitedStops: []
         )
         
         currentTrip = trip
@@ -77,9 +79,61 @@ class TripViewModel: ObservableObject {
             tripTime: trip.tripTime,
             stops: trip.stops,
             seats: trip.seats.map { Seat(number: $0.number, stopId: $0.stopId, isOccupied: false) },
-            createdAt: Date()
+            createdAt: Date(),
+            isActive: false,
+            visitedStops: []
         )
         saveTripToList(newTrip)
+    }
+    
+    // MARK: - Trip Status Management
+    func startTrip(_ trip: Trip) {
+        var updatedTrip = trip
+        updatedTrip.isActive = true
+        updatedTrip.visitedStops = []
+        updateTrip(updatedTrip)
+    }
+    
+    func arriveAtStop(_ stopId: UUID, for trip: Trip) {
+        var updatedTrip = trip
+        
+        // Durağı ziyaret edilenler listesine ekle
+        if !updatedTrip.visitedStops.contains(stopId) {
+            updatedTrip.visitedStops.append(stopId)
+        }
+        
+        // Bu durağa inen yolcuların koltuklarını boşalt
+        updatedTrip.seats = updatedTrip.seats.map { seat in
+            var updatedSeat = seat
+            if seat.stopId == stopId && seat.isOccupied {
+                updatedSeat.isOccupied = false
+                updatedSeat.stopId = nil
+            }
+            return updatedSeat
+        }
+        
+        updateTrip(updatedTrip)
+    }
+    
+    func endTrip(_ trip: Trip) {
+        var updatedTrip = trip
+        updatedTrip.isActive = false
+        updatedTrip.visitedStops = []
+        updateTrip(updatedTrip)
+    }
+    
+    func updateTripById(_ tripId: UUID, update: (inout Trip) -> Void) {
+        if let index = allTrips.firstIndex(where: { $0.id == tripId }) {
+            var trip = allTrips[index]
+            update(&trip)
+            allTrips[index] = trip
+            saveAllTrips()
+            
+            if currentTrip?.id == tripId {
+                currentTrip = trip
+                saveCurrentTrip()
+            }
+        }
     }
     
     // MARK: - Stop Management

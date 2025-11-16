@@ -5,6 +5,7 @@ struct TripDetailView: View {
     @ObservedObject var viewModel: TripViewModel
     @State private var selectedSeatForStop: Seat?
     @State private var showingStopSelection = false
+    @State private var showingTripStatus = false
     @Environment(\.dismiss) var dismiss
     
     // Seferin güncel halini almak için
@@ -26,6 +27,58 @@ struct TripDetailView: View {
                 if let trip = currentTrip {
                     ScrollView {
                         VStack(spacing: 20) {
+                            // Sefer Durumu Butonu
+                            if trip.isActive {
+                                Button(action: {
+                                    showingTripStatus = true
+                                }) {
+                                    HStack(spacing: 12) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(BusTheme.successGreen)
+                                                .frame(width: 12, height: 12)
+                                            
+                                            Circle()
+                                                .fill(BusTheme.successGreen.opacity(0.3))
+                                                .frame(width: 20, height: 20)
+                                        }
+                                        
+                                        Text("Sefer Devam Ediyor - Durumu Görüntüle")
+                                            .fontWeight(.semibold)
+                                        
+                                        Spacer()
+                                        
+                                        Image(systemName: "chevron.right")
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(
+                                        LinearGradient(
+                                            colors: [BusTheme.successGreen, BusTheme.successGreen.opacity(0.8)],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .cornerRadius(12)
+                                }
+                                .padding(.horizontal)
+                                .padding(.top)
+                            } else {
+                                Button(action: {
+                                    viewModel.startTrip(trip)
+                                }) {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "play.circle.fill")
+                                            .font(.title3)
+                                        Text("Seferi Başlat")
+                                            .fontWeight(.semibold)
+                                    }
+                                }
+                                .buttonStyle(BusPrimaryButtonStyle(isEnabled: true))
+                                .padding(.horizontal)
+                                .padding(.top)
+                            }
+                            
                             // Sefer Bilgileri Card
                             VStack(alignment: .leading, spacing: 16) {
                                 BusSectionHeader(title: "Sefer Bilgileri", icon: "info.circle.fill")
@@ -41,7 +94,6 @@ struct TripDetailView: View {
                             }
                             .busCard()
                             .padding(.horizontal)
-                            .padding(.top)
                             
                             // Koltuk Yönetimi
                             if trip.stops.isEmpty {
@@ -158,6 +210,11 @@ struct TripDetailView: View {
                             showingStopSelection = false
                         }
                     )
+                }
+            }
+            .sheet(isPresented: $showingTripStatus) {
+                if let trip = currentTrip {
+                    TripStatusView(trip: trip, viewModel: viewModel)
                 }
             }
         }
