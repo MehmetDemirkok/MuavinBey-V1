@@ -106,7 +106,21 @@ struct TwoPlusOneLayout: View {
         VStack(spacing: 8) {
             ForEach(0..<rows, id: \.self) { row in
                 HStack(spacing: 8) {
-                    // Sol taraf (2 koltuk)
+                    // Sol taraf (1 koltuk - tekli)
+                    if row * 3 + 2 < seats.count {
+                        BusSeatView(seat: seats[row * 3 + 2], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Spacer()
+                            .frame(maxWidth: .infinity)
+                    }
+                    
+                    // Koridor
+                    Rectangle()
+                        .fill(Color.clear)
+                        .frame(width: 20)
+                    
+                    // Sağ taraf (2 koltuk - çiftli)
                     HStack(spacing: 4) {
                         if row * 3 < seats.count {
                             BusSeatView(seat: seats[row * 3], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
@@ -116,20 +130,6 @@ struct TwoPlusOneLayout: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    
-                    // Koridor
-                    Rectangle()
-                        .fill(Color.clear)
-                        .frame(width: 20)
-                    
-                    // Sağ taraf (1 koltuk)
-                    if row * 3 + 2 < seats.count {
-                        BusSeatView(seat: seats[row * 3 + 2], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
-                            .frame(maxWidth: .infinity)
-                    } else {
-                        Spacer()
-                            .frame(maxWidth: .infinity)
-                    }
                 }
             }
         }
