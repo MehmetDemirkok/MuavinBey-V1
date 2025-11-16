@@ -81,14 +81,19 @@ struct SeatAssignmentView: View {
                         }
                         .navigationTitle("Koltuk Yönetimi")
                         .navigationBarTitleDisplayMode(.inline)
-                        .sheet(isPresented: $showingStopSelection) {
-                            if let seat = selectedSeatForStop {
-                                StopSelectionSheet(
+                        .overlay {
+                            // Durak Seçim Popup'ı
+                            if showingStopSelection,
+                               let seat = selectedSeatForStop {
+                                StopSelectionPopup(
                                     seat: seat,
                                     stops: trip.stops,
                                     selectedStopId: seat.stopId,
                                     onSelect: { stopId in
                                         viewModel.updateSeat(seat, stopId: stopId)
+                                        showingStopSelection = false
+                                    },
+                                    onDismiss: {
                                         showingStopSelection = false
                                     }
                                 )
@@ -206,6 +211,116 @@ struct SeatRow: View {
     }
 }
 
+// Popup versiyonu - sayfa değişmeden açılır
+struct StopSelectionPopup: View {
+    let seat: Seat
+    let stops: [Stop]
+    let selectedStopId: UUID?
+    let onSelect: (UUID?) -> Void
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        ZStack {
+            // Arka plan - tıklanabilir ve yarı saydam
+            Color.black.opacity(0.4)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    onDismiss()
+                }
+            
+            // Popup içeriği
+            VStack(spacing: 0) {
+                // Header
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 12) {
+                            SeatBadge(number: seat.number, isOccupied: seat.isOccupied)
+                            Text("Koltuk \(seat.number)")
+                                .font(.headline)
+                                .foregroundColor(BusTheme.textPrimary)
+                        }
+                        Text("İneceği durak seçin")
+                            .font(.subheadline)
+                            .foregroundColor(BusTheme.textSecondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: onDismiss) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(BusTheme.textSecondary)
+                    }
+                }
+                .padding()
+                .background(BusTheme.backgroundCard)
+                
+                // Duraklar listesi
+                ScrollView {
+                    VStack(spacing: 12) {
+                        Button(action: {
+                            onSelect(nil)
+                        }) {
+                            HStack {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(BusTheme.textSecondary)
+                                Text("Durak Seçilmedi")
+                                    .foregroundColor(BusTheme.textPrimary)
+                                Spacer()
+                                if selectedStopId == nil {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(BusTheme.successGreen)
+                                }
+                            }
+                            .padding()
+                            .background(BusTheme.backgroundCard)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(selectedStopId == nil ? BusTheme.primaryBlue : Color.clear, lineWidth: 2)
+                            )
+                        }
+                        
+                        ForEach(stops) { stop in
+                            Button(action: {
+                                onSelect(stop.id)
+                            }) {
+                                HStack {
+                                    Image(systemName: "mappin.circle.fill")
+                                        .foregroundColor(BusTheme.primaryOrange)
+                                    Text(stop.name)
+                                        .foregroundColor(BusTheme.textPrimary)
+                                    Spacer()
+                                    if selectedStopId == stop.id {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(BusTheme.successGreen)
+                                    }
+                                }
+                                .padding()
+                                .background(BusTheme.backgroundCard)
+                                .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(selectedStopId == stop.id ? BusTheme.primaryBlue : Color.clear, lineWidth: 2)
+                                )
+                            }
+                        }
+                    }
+                    .padding()
+                }
+                .frame(maxHeight: 400)
+                .background(BusTheme.backgroundLight)
+            }
+            .frame(maxWidth: 350)
+            .background(BusTheme.backgroundCard)
+            .cornerRadius(20)
+            .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
+            .padding()
+        }
+    }
+}
+
+// Eski sheet versiyonu (başka yerlerde kullanılıyorsa)
 struct StopSelectionSheet: View {
     let seat: Seat
     let stops: [Stop]

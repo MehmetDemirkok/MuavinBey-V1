@@ -190,15 +190,20 @@ struct TripDetailView: View {
             }
             .navigationTitle("Sefer Detayı")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showingStopSelection) {
-                if let seat = selectedSeatForStop,
+            .overlay {
+                // Durak Seçim Popup'ı
+                if showingStopSelection,
+                   let seat = selectedSeatForStop,
                    let trip = currentTrip {
-                    StopSelectionSheet(
+                    StopSelectionPopup(
                         seat: seat,
                         stops: trip.stops,
                         selectedStopId: seat.stopId,
                         onSelect: { stopId in
                             updateSeat(seat, stopId: stopId)
+                            showingStopSelection = false
+                        },
+                        onDismiss: {
                             showingStopSelection = false
                         }
                     )
