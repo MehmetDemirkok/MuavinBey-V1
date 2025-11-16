@@ -159,10 +159,6 @@ struct TripStatusView: View {
                     if let stop = stopToArrive,
                        let trip = currentTrip {
                         viewModel.arriveAtStop(stop.id, for: trip)
-                        // View'ı güncellemek için biraz bekle
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            // View otomatik güncellenecek
-                        }
                     }
                     stopToArrive = nil
                 }
@@ -170,9 +166,6 @@ struct TripStatusView: View {
                 if let stop = stopToArrive {
                     Text("'\(stop.name)' durağına varıldı. Bu durağa inen yolcuların koltukları otomatik olarak boşaltılacak.")
                 }
-            }
-            .onChange(of: viewModel.allTrips) { _ in
-                // Trip güncellendiğinde view'ı yenile
             }
         }
     }
