@@ -197,6 +197,20 @@ struct StartView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             BusSectionHeader(title: "Duraklar (Opsiyonel)", icon: "mappin.circle.fill")
                             
+                            // Uyarı Metni
+                            HStack(spacing: 12) {
+                                Image(systemName: "info.circle.fill")
+                                    .foregroundColor(BusTheme.primaryOrange)
+                                    .font(.system(size: 18))
+                                Text("Yolcuların ineceği durakları ve mola yerlerini eklemeyi unutmayın")
+                                    .font(.subheadline)
+                                    .foregroundColor(BusTheme.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding()
+                            .background(BusTheme.primaryOrange.opacity(0.1))
+                            .cornerRadius(12)
+                            
                             if stops.isEmpty {
                                 Text("Henüz durak eklenmedi")
                                     .font(.subheadline)
