@@ -326,10 +326,18 @@ struct StartView: View {
         // Başarı mesajı göster
         showingSuccess = true
         
-        // Form'u temizle (opsiyonel - kullanıcı yeni sefer oluşturmak isteyebilir)
-        // seatCount = ""
-        // routeStart = ""
-        // routeEnd = ""
+        // Form'u temizle - yeni sefer oluşturmaya hazır
+        resetForm()
+    }
+    
+    private func resetForm() {
+        vehiclePlate = ""
+        seatLayout = "2+1"
+        seatCount = ""
+        routeStart = ""
+        routeEnd = ""
+        tripTime = ""
+        stops = []
     }
 }
 
