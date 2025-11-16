@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SeatAssignmentView: View {
     @ObservedObject var viewModel: TripViewModel
+    @State private var selectedSeatForStop: Seat?
+    @State private var showingStopSelection = false
     
     var body: some View {
         NavigationStack {
@@ -38,7 +40,7 @@ struct SeatAssignmentView: View {
                                 .fontWeight(.semibold)
                                 .foregroundColor(BusTheme.textPrimary)
                             
-                            Text("Koltuklara durak atamak için önce 'Duraklar' sekmesinden durak ekleyin")
+                            Text("Koltuklara durak atamak için önce sefer oluştururken durak ekleyin")
                                 .font(.subheadline)
                                 .foregroundColor(BusTheme.textSecondary)
                                 .multilineTextAlignment(.center)
@@ -48,25 +50,59 @@ struct SeatAssignmentView: View {
                         .navigationTitle("Koltuk Yönetimi")
                     } else {
                         ScrollView {
-                            LazyVStack(spacing: 12) {
-                                ForEach(trip.seats.sorted(by: { $0.number < $1.number })) { seat in
-                                    SeatRow(
-                                        seat: seat,
-                                        stops: trip.stops,
-                                        onStopChange: { stopId in
-                                            viewModel.updateSeat(seat, stopId: stopId)
-                                        },
-                                        onToggleOccupation: {
-                                            viewModel.toggleSeatOccupation(seat)
+                            VStack(spacing: 20) {
+                                // Otobüs Görseli
+                                BusSeatLayoutView(
+                                    trip: trip,
+                                    stops: trip.stops,
+                                    onSeatTap: { seat in
+                                        viewModel.toggleSeatOccupation(seat)
+                                    },
+                                    onSeatLongPress: { seat in
+                                        selectedSeatForStop = seat
+                                        showingStopSelection = true
+                                    }
+                                )
+                                
+                                // Koltuk Detayları ve Durak Seçimi
+                                VStack(alignment: .leading, spacing: 16) {
+                                    BusSectionHeader(title: "Koltuk Detayları", icon: "list.bullet")
+                                    
+                                    LazyVStack(spacing: 12) {
+                                        ForEach(trip.seats.sorted(by: { $0.number < $1.number })) { seat in
+                                            SeatRow(
+                                                seat: seat,
+                                                stops: trip.stops,
+                                                onStopChange: { stopId in
+                                                    viewModel.updateSeat(seat, stopId: stopId)
+                                                },
+                                                onToggleOccupation: {
+                                                    viewModel.toggleSeatOccupation(seat)
+                                                }
+                                            )
                                         }
-                                    )
-                                    .padding(.horizontal)
+                                    }
                                 }
+                                .busCard()
+                                .padding(.horizontal)
                             }
                             .padding(.vertical)
                         }
                         .navigationTitle("Koltuk Yönetimi")
                         .navigationBarTitleDisplayMode(.inline)
+                        .sheet(isPresented: $showingStopSelection) {
+                            if let seat = selectedSeatForStop {
+                                StopSelectionSheet(
+                                    seat: seat,
+                                    stops: trip.stops,
+                                    selectedStopId: seat.stopId,
+                                    onSelect: { stopId in
+                                        viewModel.updateSeat(seat, stopId: stopId)
+                                        showingStopSelection = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 } else {
                     VStack(spacing: 24) {
@@ -176,6 +212,102 @@ struct SeatRow: View {
             return stop.name
         }
         return "Durak Seç"
+    }
+}
+
+struct StopSelectionSheet: View {
+    let seat: Seat
+    let stops: [Stop]
+    let selectedStopId: UUID?
+    let onSelect: (UUID?) -> Void
+    
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                LinearGradient(
+                    colors: [BusTheme.backgroundLight, BusTheme.primaryOrange.opacity(0.05)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                
+                VStack(spacing: 24) {
+                    VStack(spacing: 12) {
+                        SeatBadge(number: seat.number, isOccupied: seat.isOccupied)
+                        
+                        Text("Koltuk \(seat.number) için durak seçin")
+                            .font(.headline)
+                            .foregroundColor(BusTheme.textPrimary)
+                    }
+                    .padding(.top, 40)
+                    
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            Button(action: {
+                                onSelect(nil)
+                            }) {
+                                HStack {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(BusTheme.textSecondary)
+                                    Text("Durak Seçilmedi")
+                                        .foregroundColor(BusTheme.textPrimary)
+                                    Spacer()
+                                    if selectedStopId == nil {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(BusTheme.successGreen)
+                                    }
+                                }
+                                .padding()
+                                .background(BusTheme.backgroundCard)
+                                .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(selectedStopId == nil ? BusTheme.primaryBlue : Color.clear, lineWidth: 2)
+                                )
+                            }
+                            
+                            ForEach(stops) { stop in
+                                Button(action: {
+                                    onSelect(stop.id)
+                                }) {
+                                    HStack {
+                                        Image(systemName: "mappin.circle.fill")
+                                            .foregroundColor(BusTheme.primaryOrange)
+                                        Text(stop.name)
+                                            .foregroundColor(BusTheme.textPrimary)
+                                        Spacer()
+                                        if selectedStopId == stop.id {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundColor(BusTheme.successGreen)
+                                        }
+                                    }
+                                    .padding()
+                                    .background(BusTheme.backgroundCard)
+                                    .cornerRadius(12)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(selectedStopId == stop.id ? BusTheme.primaryBlue : Color.clear, lineWidth: 2)
+                                    )
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+            .navigationTitle("Durak Seç")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("İptal") {
+                        dismiss()
+                    }
+                    .tint(BusTheme.primaryBlue)
+                }
+            }
+        }
     }
 }
 
