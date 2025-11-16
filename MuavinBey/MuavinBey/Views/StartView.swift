@@ -246,6 +246,55 @@ struct StartView: View {
             }
         }
     }
+    
+    private var isFormValid: Bool {
+        !seatCount.isEmpty &&
+        !routeStart.isEmpty &&
+        !routeEnd.isEmpty &&
+        Int(seatCount) != nil &&
+        Int(seatCount)! > 0
+    }
+    
+    private func createTrip() {
+        // Klavye'yi kapat
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        
+        guard let count = Int(seatCount), count > 0 else {
+            errorMessage = "Geçerli bir koltuk sayısı giriniz"
+            showingError = true
+            return
+        }
+        
+        guard !routeStart.trimmingCharacters(in: .whitespaces).isEmpty else {
+            errorMessage = "Başlangıç noktası boş olamaz"
+            showingError = true
+            return
+        }
+        
+        guard !routeEnd.trimmingCharacters(in: .whitespaces).isEmpty else {
+            errorMessage = "Bitiş noktası boş olamaz"
+            showingError = true
+            return
+        }
+        
+        // Sefer oluştur
+        viewModel.createTrip(
+            vehicleType: vehicleType,
+            seatLayout: seatLayout,
+            seatCount: count,
+            routeStart: routeStart.trimmingCharacters(in: .whitespaces),
+            routeEnd: routeEnd.trimmingCharacters(in: .whitespaces),
+            stops: stops
+        )
+        
+        // Başarı mesajı göster
+        showingSuccess = true
+        
+        // Form'u temizle (opsiyonel - kullanıcı yeni sefer oluşturmak isteyebilir)
+        // seatCount = ""
+        // routeStart = ""
+        // routeEnd = ""
+    }
 }
 
 struct AddStopSheetForStart: View {
@@ -333,55 +382,6 @@ struct AddStopSheetForStart: View {
                 isTextFieldFocused = true
             }
         }
-    }
-    
-    private var isFormValid: Bool {
-        !seatCount.isEmpty &&
-        !routeStart.isEmpty &&
-        !routeEnd.isEmpty &&
-        Int(seatCount) != nil &&
-        Int(seatCount)! > 0
-    }
-    
-    private func createTrip() {
-        // Klavye'yi kapat
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        
-        guard let count = Int(seatCount), count > 0 else {
-            errorMessage = "Geçerli bir koltuk sayısı giriniz"
-            showingError = true
-            return
-        }
-        
-        guard !routeStart.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Başlangıç noktası boş olamaz"
-            showingError = true
-            return
-        }
-        
-        guard !routeEnd.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Bitiş noktası boş olamaz"
-            showingError = true
-            return
-        }
-        
-        // Sefer oluştur
-        viewModel.createTrip(
-            vehicleType: vehicleType,
-            seatLayout: seatLayout,
-            seatCount: count,
-            routeStart: routeStart.trimmingCharacters(in: .whitespaces),
-            routeEnd: routeEnd.trimmingCharacters(in: .whitespaces),
-            stops: stops
-        )
-        
-        // Başarı mesajı göster
-        showingSuccess = true
-        
-        // Form'u temizle (opsiyonel - kullanıcı yeni sefer oluşturmak isteyebilir)
-        // seatCount = ""
-        // routeStart = ""
-        // routeEnd = ""
     }
 }
 
