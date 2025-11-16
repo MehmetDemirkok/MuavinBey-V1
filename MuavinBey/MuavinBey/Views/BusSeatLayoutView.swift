@@ -30,12 +30,14 @@ struct BusSeatLayoutView: View {
                     if trip.seatLayout == "2+1" {
                         TwoPlusOneLayout(
                             seats: trip.seats.sorted(by: { $0.number < $1.number }),
+                            stops: stops,
                             onSeatTap: onSeatTap,
                             onSeatLongPress: onSeatLongPress
                         )
                     } else {
                         TwoPlusTwoLayout(
                             seats: trip.seats.sorted(by: { $0.number < $1.number }),
+                            stops: stops,
                             onSeatTap: onSeatTap,
                             onSeatLongPress: onSeatLongPress
                         )
@@ -94,6 +96,7 @@ struct BusSeatLayoutView: View {
 
 struct TwoPlusOneLayout: View {
     let seats: [Seat]
+    let stops: [Stop]
     let onSeatTap: (Seat) -> Void
     let onSeatLongPress: (Seat) -> Void
     
@@ -106,10 +109,10 @@ struct TwoPlusOneLayout: View {
                     // Sol taraf (2 koltuk)
                     HStack(spacing: 4) {
                         if row * 3 < seats.count {
-                            BusSeatView(seat: seats[row * 3], onTap: onSeatTap, onLongPress: onSeatLongPress)
+                            BusSeatView(seat: seats[row * 3], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
                         }
                         if row * 3 + 1 < seats.count {
-                            BusSeatView(seat: seats[row * 3 + 1], onTap: onSeatTap, onLongPress: onSeatLongPress)
+                            BusSeatView(seat: seats[row * 3 + 1], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -121,7 +124,7 @@ struct TwoPlusOneLayout: View {
                     
                     // Sağ taraf (1 koltuk)
                     if row * 3 + 2 < seats.count {
-                        BusSeatView(seat: seats[row * 3 + 2], onTap: onSeatTap, onLongPress: onSeatLongPress)
+                        BusSeatView(seat: seats[row * 3 + 2], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
                             .frame(maxWidth: .infinity)
                     } else {
                         Spacer()
@@ -135,6 +138,7 @@ struct TwoPlusOneLayout: View {
 
 struct TwoPlusTwoLayout: View {
     let seats: [Seat]
+    let stops: [Stop]
     let onSeatTap: (Seat) -> Void
     let onSeatLongPress: (Seat) -> Void
     
@@ -147,10 +151,10 @@ struct TwoPlusTwoLayout: View {
                     // Sol taraf (2 koltuk)
                     HStack(spacing: 4) {
                         if row * 4 < seats.count {
-                            BusSeatView(seat: seats[row * 4], onTap: onSeatTap, onLongPress: onSeatLongPress)
+                            BusSeatView(seat: seats[row * 4], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
                         }
                         if row * 4 + 1 < seats.count {
-                            BusSeatView(seat: seats[row * 4 + 1], onTap: onSeatTap, onLongPress: onSeatLongPress)
+                            BusSeatView(seat: seats[row * 4 + 1], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -163,10 +167,10 @@ struct TwoPlusTwoLayout: View {
                     // Sağ taraf (2 koltuk)
                     HStack(spacing: 4) {
                         if row * 4 + 2 < seats.count {
-                            BusSeatView(seat: seats[row * 4 + 2], onTap: onSeatTap, onLongPress: onSeatLongPress)
+                            BusSeatView(seat: seats[row * 4 + 2], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
                         }
                         if row * 4 + 3 < seats.count {
-                            BusSeatView(seat: seats[row * 4 + 3], onTap: onSeatTap, onLongPress: onSeatLongPress)
+                            BusSeatView(seat: seats[row * 4 + 3], stops: stops, onTap: onSeatTap, onLongPress: onSeatLongPress)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -178,56 +182,81 @@ struct TwoPlusTwoLayout: View {
 
 struct BusSeatView: View {
     let seat: Seat
+    let stops: [Stop]
     let onTap: (Seat) -> Void
     let onLongPress: (Seat) -> Void
     
     @State private var isPressed = false
     
     var body: some View {
-        Button(action: {
-            onTap(seat)
-        }) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(
-                        seat.isOccupied ?
-                        LinearGradient(
-                            colors: [BusTheme.seatOccupied, BusTheme.accentBlue],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ) :
-                        LinearGradient(
-                            colors: [BusTheme.seatEmpty, Color.gray.opacity(0.1)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+        VStack(spacing: 2) {
+            Button(action: {
+                onTap(seat)
+            }) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(
+                            seat.isOccupied ?
+                            LinearGradient(
+                                colors: [BusTheme.seatOccupied, BusTheme.accentBlue],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ) :
+                            LinearGradient(
+                                colors: [BusTheme.seatEmpty, Color.gray.opacity(0.1)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .frame(width: 50, height: 50)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(seat.isOccupied ? BusTheme.primaryBlue.opacity(0.5) : Color.gray.opacity(0.3), lineWidth: 1.5)
-                    )
-                    .shadow(color: seat.isOccupied ? BusTheme.primaryBlue.opacity(0.3) : Color.clear, radius: 4, x: 0, y: 2)
-                
-                Text("\(seat.number)")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(seat.isOccupied ? .white : BusTheme.textPrimary)
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(seat.isOccupied ? BusTheme.primaryBlue.opacity(0.5) : Color.gray.opacity(0.3), lineWidth: 1.5)
+                        )
+                        .shadow(color: seat.isOccupied ? BusTheme.primaryBlue.opacity(0.3) : Color.clear, radius: 4, x: 0, y: 2)
+                    
+                    Text("\(seat.number)")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(seat.isOccupied ? .white : BusTheme.textPrimary)
+                }
+            }
+            .buttonStyle(.plain)
+            .scaleEffect(isPressed ? 0.9 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
+            .simultaneousGesture(
+                LongPressGesture(minimumDuration: 0.5)
+                    .onEnded { _ in
+                        onLongPress(seat)
+                    }
+            )
+            .onLongPressGesture(minimumDuration: 0.1) {
+                isPressed = true
+            } onPressingChanged: { pressing in
+                isPressed = pressing
+            }
+            
+            // Durak adı (eğer seçilmişse)
+            if let stopId = seat.stopId,
+               let stop = stops.first(where: { $0.id == stopId }) {
+                Text(stop.name)
+                    .font(.system(size: 8, weight: .medium))
+                    .foregroundColor(BusTheme.primaryOrange)
+                    .lineLimit(1)
+                    .frame(maxWidth: 50)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
+                    .background(BusTheme.primaryOrange.opacity(0.15))
+                    .cornerRadius(4)
             }
         }
-        .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.9 : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: isPressed)
-        .simultaneousGesture(
-            LongPressGesture(minimumDuration: 0.5)
-                .onEnded { _ in
-                    onLongPress(seat)
-                }
-        )
-        .onLongPressGesture(minimumDuration: 0.1) {
-            isPressed = true
-        } onPressingChanged: { pressing in
-            isPressed = pressing
+    }
+    
+    private var selectedStopName: String? {
+        if let stopId = seat.stopId,
+           let stop = stops.first(where: { $0.id == stopId }) {
+            return stop.name
         }
+        return nil
     }
 }
 
