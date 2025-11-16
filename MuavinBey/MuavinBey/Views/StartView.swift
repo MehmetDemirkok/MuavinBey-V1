@@ -3,7 +3,7 @@ import UIKit
 
 struct StartView: View {
     @ObservedObject var viewModel: TripViewModel
-    @State private var vehicleType = "Otobüs"
+    @State private var vehiclePlate = ""
     @State private var seatLayout = "2+1"
     @State private var seatCount = ""
     @State private var routeStart = ""
@@ -15,7 +15,6 @@ struct StartView: View {
     @State private var newStopName = ""
     @State private var showingAddStop = false
     
-    let vehicleTypes = ["Otobüs", "Midibüs", "Minibüs"]
     let seatLayouts = ["2+1", "2+2"]
     
     var body: some View {
@@ -62,21 +61,22 @@ struct StartView: View {
                             BusSectionHeader(title: "Araç Bilgileri", icon: "car.fill")
                             
                             VStack(spacing: 16) {
-                                // Araç Tipi
+                                // Araç Plakası
                                 HStack {
-                                    Image(systemName: "bus")
+                                    Image(systemName: "numberplate")
                                         .foregroundColor(BusTheme.primaryBlue)
                                         .frame(width: 24)
-                                    Text("Araç Tipi")
+                                    Text("Araç Plakası")
                                         .foregroundColor(BusTheme.textSecondary)
                                     Spacer()
-                                    Picker("", selection: $vehicleType) {
-                                        ForEach(vehicleTypes, id: \.self) { type in
-                                            Text(type).tag(type)
-                                        }
-                                    }
-                                    .pickerStyle(.menu)
-                                    .tint(BusTheme.primaryBlue)
+                                    TextField("Örn: 34 ABC 123", text: $vehiclePlate)
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 150)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(BusTheme.primaryBlue.opacity(0.1))
+                                        .cornerRadius(8)
+                                        .autocapitalization(.allCharacters)
                                 }
                                 .padding()
                                 .background(BusTheme.backgroundCard)
@@ -248,6 +248,7 @@ struct StartView: View {
     }
     
     private var isFormValid: Bool {
+        !vehiclePlate.isEmpty &&
         !seatCount.isEmpty &&
         !routeStart.isEmpty &&
         !routeEnd.isEmpty &&
@@ -277,9 +278,15 @@ struct StartView: View {
             return
         }
         
+        guard !vehiclePlate.trimmingCharacters(in: .whitespaces).isEmpty else {
+            errorMessage = "Araç plakası boş olamaz"
+            showingError = true
+            return
+        }
+        
         // Sefer oluştur
         viewModel.createTrip(
-            vehicleType: vehicleType,
+            vehiclePlate: vehiclePlate.trimmingCharacters(in: .whitespaces).uppercased(),
             seatLayout: seatLayout,
             seatCount: count,
             routeStart: routeStart.trimmingCharacters(in: .whitespaces),

@@ -54,9 +54,10 @@ struct BusSeatLayoutView: View {
             // Otobüs Alt Kısmı
             HStack {
                 Spacer()
-                Text("\(trip.vehicleType)")
+                Text("\(trip.vehiclePlate)")
                     .font(.caption)
-                    .foregroundColor(BusTheme.textSecondary)
+                    .fontWeight(.semibold)
+                    .foregroundColor(BusTheme.primaryBlue)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
                     .background(BusTheme.primaryBlue.opacity(0.1))

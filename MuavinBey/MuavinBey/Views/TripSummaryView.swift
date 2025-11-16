@@ -49,9 +49,9 @@ struct TripSummaryView: View {
                                 
                                 VStack(spacing: 12) {
                                     InfoCard(
-                                        icon: "bus.fill",
-                                        title: "Araç Tipi",
-                                        value: trip.vehicleType,
+                                        icon: "numberplate",
+                                        title: "Araç Plakası",
+                                        value: trip.vehiclePlate,
                                         color: BusTheme.primaryBlue
                                     )
                                     

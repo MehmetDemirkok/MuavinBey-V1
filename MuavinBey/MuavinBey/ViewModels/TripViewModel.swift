@@ -18,7 +18,7 @@ class TripViewModel: ObservableObject {
     
     // MARK: - Trip Management
     func createTrip(
-        vehicleType: String,
+        vehiclePlate: String,
         seatLayout: String,
         seatCount: Int,
         routeStart: String,
@@ -28,13 +28,14 @@ class TripViewModel: ObservableObject {
         let seats = (1...seatCount).map { Seat(number: $0) }
         
         let trip = Trip(
-            vehicleType: vehicleType,
+            vehiclePlate: vehiclePlate,
             seatLayout: seatLayout,
             seatCount: seatCount,
             routeStart: routeStart,
             routeEnd: routeEnd,
             stops: stops,
-            seats: seats
+            seats: seats,
+            createdAt: Date()
         )
         
         currentTrip = trip
@@ -66,13 +67,14 @@ class TripViewModel: ObservableObject {
     func duplicateTrip(_ trip: Trip) {
         var newTrip = trip
         newTrip = Trip(
-            vehicleType: trip.vehicleType,
+            vehiclePlate: trip.vehiclePlate,
             seatLayout: trip.seatLayout,
             seatCount: trip.seatCount,
             routeStart: trip.routeStart,
             routeEnd: trip.routeEnd,
             stops: trip.stops,
-            seats: trip.seats.map { Seat(number: $0.number, stopId: $0.stopId, isOccupied: false) }
+            seats: trip.seats.map { Seat(number: $0.number, stopId: $0.stopId, isOccupied: false) },
+            createdAt: Date()
         )
         saveTripToList(newTrip)
     }

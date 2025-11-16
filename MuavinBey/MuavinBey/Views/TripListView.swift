@@ -112,9 +112,9 @@ struct TripCard: View {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Image(systemName: "bus.fill")
+                        Image(systemName: "numberplate")
                             .foregroundColor(BusTheme.primaryBlue)
-                        Text(trip.vehicleType)
+                        Text(trip.vehiclePlate)
                             .font(.headline)
                             .foregroundColor(BusTheme.textPrimary)
                     }
@@ -141,6 +141,16 @@ struct TripCard: View {
                             .font(.caption)
                             .foregroundColor(BusTheme.textSecondary)
                     }
+                    
+                    HStack {
+                        Image(systemName: "calendar")
+                            .foregroundColor(BusTheme.accentBlue)
+                            .font(.caption)
+                        Text(trip.formattedDate)
+                            .font(.caption)
+                            .foregroundColor(BusTheme.textSecondary)
+                    }
+                    .padding(.top, 4)
                 }
                 
                 Spacer()

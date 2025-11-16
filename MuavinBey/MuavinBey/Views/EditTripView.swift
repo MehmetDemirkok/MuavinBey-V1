@@ -5,7 +5,7 @@ struct EditTripView: View {
     @ObservedObject var viewModel: TripViewModel
     let trip: Trip
     
-    @State private var vehicleType: String
+    @State private var vehiclePlate: String
     @State private var seatLayout: String
     @State private var seatCount: String
     @State private var routeStart: String
@@ -19,13 +19,12 @@ struct EditTripView: View {
     
     @Environment(\.dismiss) var dismiss
     
-    let vehicleTypes = ["Otobüs", "Midibüs", "Minibüs"]
     let seatLayouts = ["2+1", "2+2"]
     
     init(viewModel: TripViewModel, trip: Trip) {
         self.viewModel = viewModel
         self.trip = trip
-        _vehicleType = State(initialValue: trip.vehicleType)
+        _vehiclePlate = State(initialValue: trip.vehiclePlate)
         _seatLayout = State(initialValue: trip.seatLayout)
         _seatCount = State(initialValue: "\(trip.seatCount)")
         _routeStart = State(initialValue: trip.routeStart)
@@ -76,19 +75,20 @@ struct EditTripView: View {
                             
                             VStack(spacing: 16) {
                                 HStack {
-                                    Image(systemName: "bus")
+                                    Image(systemName: "numberplate")
                                         .foregroundColor(BusTheme.primaryBlue)
                                         .frame(width: 24)
-                                    Text("Araç Tipi")
+                                    Text("Araç Plakası")
                                         .foregroundColor(BusTheme.textSecondary)
                                     Spacer()
-                                    Picker("", selection: $vehicleType) {
-                                        ForEach(vehicleTypes, id: \.self) { type in
-                                            Text(type).tag(type)
-                                        }
-                                    }
-                                    .pickerStyle(.menu)
-                                    .tint(BusTheme.primaryBlue)
+                                    TextField("Örn: 34 ABC 123", text: $vehiclePlate)
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 150)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(BusTheme.primaryBlue.opacity(0.1))
+                                        .cornerRadius(8)
+                                        .autocapitalization(.allCharacters)
                                 }
                                 .padding()
                                 .background(BusTheme.backgroundCard)
@@ -292,8 +292,14 @@ struct EditTripView: View {
             return
         }
         
+        guard !vehiclePlate.trimmingCharacters(in: .whitespaces).isEmpty else {
+            errorMessage = "Araç plakası boş olamaz"
+            showingError = true
+            return
+        }
+        
         var updatedTrip = trip
-        updatedTrip.vehicleType = vehicleType
+        updatedTrip.vehiclePlate = vehiclePlate.trimmingCharacters(in: .whitespaces).uppercased()
         updatedTrip.seatLayout = seatLayout
         updatedTrip.seatCount = count
         updatedTrip.routeStart = routeStart.trimmingCharacters(in: .whitespaces)
