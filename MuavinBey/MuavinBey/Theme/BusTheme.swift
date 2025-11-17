@@ -103,13 +103,20 @@ extension View {
 // MARK: - Section Header Style
 struct BusSectionHeader: View {
     let title: String
-    let icon: String
+    let icon: String?
+    
+    init(title: String, icon: String? = nil) {
+        self.title = title
+        self.icon = icon
+    }
     
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: icon)
-                .foregroundColor(BusTheme.primaryBlue)
-                .font(.system(size: 16, weight: .semibold))
+            if let icon = icon {
+                Image(systemName: icon)
+                    .foregroundColor(BusTheme.primaryBlue)
+                    .font(.system(size: 16, weight: .semibold))
+            }
             Text(title)
                 .font(.headline)
                 .foregroundColor(BusTheme.primaryBlue)

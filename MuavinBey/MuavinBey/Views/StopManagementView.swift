@@ -170,7 +170,7 @@ struct AddStopSheet: View {
                     .padding(.top, 40)
                     
                     VStack(alignment: .leading, spacing: 12) {
-                        BusSectionHeader(title: "Durak Adı", icon: "textformat")
+                        BusSectionHeader(title: "Durak Adı")
                         
                         TextField("Örn: Esenler Otogar", text: $stopName)
                             .focused($isTextFieldFocused)
