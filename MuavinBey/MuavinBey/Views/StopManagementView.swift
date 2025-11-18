@@ -6,7 +6,7 @@ struct StopManagementView: View {
     @State private var showingAddStop = false
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 // Background Gradient
                 LinearGradient(
@@ -141,7 +141,7 @@ struct AddStopSheet: View {
     @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 LinearGradient(
                     colors: [BusTheme.backgroundLight, BusTheme.primaryOrange.opacity(0.05)],

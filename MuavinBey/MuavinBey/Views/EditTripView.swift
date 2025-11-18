@@ -35,7 +35,7 @@ struct EditTripView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 LinearGradient(
                     colors: [BusTheme.backgroundLight, BusTheme.primaryOrange.opacity(0.05)],

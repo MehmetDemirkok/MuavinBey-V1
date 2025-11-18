@@ -13,7 +13,7 @@ struct TripStatusView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 LinearGradient(
                     colors: [BusTheme.backgroundLight, BusTheme.primaryBlue.opacity(0.05)],

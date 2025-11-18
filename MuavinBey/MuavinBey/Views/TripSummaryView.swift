@@ -4,7 +4,7 @@ struct TripSummaryView: View {
     @ObservedObject var viewModel: TripViewModel
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 // Background Gradient
                 LinearGradient(

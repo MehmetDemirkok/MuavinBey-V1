@@ -12,7 +12,7 @@ iOS SwiftUI ile geliştirilmiş offline sefer takip uygulaması.
    - Product Name: `MuavinBey`
    - Interface: **SwiftUI**
    - Language: **Swift**
-   - Minimum iOS: **16.0**
+   - Minimum iOS: **15.0**
 4. Projeyi kaydedin ve **Create**'e basın
 
 ### Dosyaları Ekleme
@@ -83,7 +83,7 @@ MuavinBey/
 - ✅ Offline çalışma (UserDefaults ile lokal saklama)
 - ✅ MVVM mimarisi
 - ✅ Dark Mode desteği
-- ✅ iOS 16+ uyumlu
+- ✅ iOS 15+ uyumlu
 - ✅ Büyük butonlu, kullanıcı dostu arayüz
 - ✅ Durak sıralama ve silme
 - ✅ Koltuk bazında yolcu takibi
@@ -93,7 +93,36 @@ MuavinBey/
 
 - **Framework**: SwiftUI
 - **Mimari**: MVVM
-- **Veri Saklama**: UserDefaults
-- **Minimum iOS**: 16.0
-- **Dil**: Swift 6.2+
+- **Veri Saklama**: UserDefaults ve FileManager
+- **Minimum iOS**: 15.0
+- **Dil**: Swift 5.0+
+- **App Store**: Yayına hazır ✅
+
+## 📦 App Store Yayını
+
+Bu proje App Store'a yayın için hazırlanmıştır. Yayın süreci için aşağıdaki dosyalara bakın:
+
+- **[APP_STORE_CHECKLIST.md](APP_STORE_CHECKLIST.md)** - Detaylı yayın checklist'i
+- **[APP_STORE_METADATA.md](APP_STORE_METADATA.md)** - App Store metadata ve açıklamalar
+- **[PRIVACY_POLICY.md](PRIVACY_POLICY.md)** - Gizlilik politikası
+
+### Yapılan Hazırlıklar
+
+✅ Minimum iOS version: 15.0 (daha geniş cihaz desteği)  
+✅ Privacy descriptions eklendi  
+✅ Export Compliance ayarları yapıldı  
+✅ Release build optimizasyonları eklendi  
+✅ App Store metadata hazırlandı  
+✅ Privacy Policy oluşturuldu  
+✅ Yayın checklist'i hazırlandı  
+
+### Yayın Öncesi Kontrol Listesi
+
+1. [ ] App Store Connect'te uygulama oluşturuldu
+2. [ ] Ekran görüntüleri hazırlandı
+3. [ ] Privacy Policy web'de yayınlandı
+4. [ ] Support URL hazırlandı (Opsiyonel - e-posta adresi yeterli)
+5. [ ] TestFlight ile test edildi
+6. [ ] Archive oluşturuldu ve yüklendi
+7. [ ] App Store incelemesi için gönderildi
 

@@ -6,7 +6,7 @@ struct SeatAssignmentView: View {
     @State private var showingStopSelection = false
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 // Background Gradient
                 LinearGradient(
@@ -330,7 +330,7 @@ struct StopSelectionSheet: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 LinearGradient(
                     colors: [BusTheme.backgroundLight, BusTheme.primaryOrange.opacity(0.05)],
