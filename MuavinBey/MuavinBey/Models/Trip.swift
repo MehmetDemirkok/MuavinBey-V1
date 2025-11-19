@@ -13,6 +13,7 @@ struct Trip: Identifiable, Codable {
     var createdAt: Date
     var isActive: Bool  // Sefer aktif mi?
     var visitedStops: [UUID]  // Ziyaret edilen duraklar
+    var isCompleted: Bool // Sefer tamamlandı mı?
     
     init(
         id: UUID = UUID(),
@@ -26,7 +27,8 @@ struct Trip: Identifiable, Codable {
         seats: [Seat] = [],
         createdAt: Date = Date(),
         isActive: Bool = false,
-        visitedStops: [UUID] = []
+        visitedStops: [UUID] = [],
+        isCompleted: Bool = false
     ) {
         self.id = id
         self.vehiclePlate = vehiclePlate
@@ -40,6 +42,7 @@ struct Trip: Identifiable, Codable {
         self.createdAt = createdAt
         self.isActive = isActive
         self.visitedStops = visitedStops
+        self.isCompleted = isCompleted
     }
     
     // Computed properties

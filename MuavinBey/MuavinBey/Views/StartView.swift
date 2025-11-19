@@ -3,12 +3,14 @@ import UIKit
 
 struct StartView: View {
     @ObservedObject var viewModel: TripViewModel
+    @Environment(\.dismiss) var dismiss
+    
     @State private var vehiclePlate = ""
     @State private var seatLayout = "2+1"
     @State private var seatCount = ""
-    @State private var routeStart = ""
-    @State private var routeEnd = ""
-    @State private var tripTime = ""
+    @State private var routeStart = "İstanbul"
+    @State private var routeEnd = "Ankara"
+    @State private var tripDate = Date()
     @State private var showingError = false
     @State private var showingSuccess = false
     @State private var errorMessage = ""
@@ -17,6 +19,17 @@ struct StartView: View {
     @State private var showingAddStop = false
     
     let seatLayouts = ["2+1", "2+2"]
+    
+    let cities = [
+        "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın", "Balıkesir",
+        "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli",
+        "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari",
+        "Hatay", "Isparta", "Mersin", "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir",
+        "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir",
+        "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat",
+        "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman",
+        "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"
+    ].sorted()
     
     var body: some View {
         NavigationView {
@@ -28,6 +41,9 @@ struct StartView: View {
                     endPoint: .bottom
                 )
                 .ignoresSafeArea()
+                .onTapGesture {
+                    hideKeyboard()
+                }
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -132,31 +148,62 @@ struct StartView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             BusSectionHeader(title: "Güzergah", icon: "map.fill")
                             
-                            VStack(spacing: 16) {
+                            // Yan Yana Layout
+                            HStack(spacing: 12) {
                                 // Başlangıç
-                                HStack {
-                                    Image(systemName: "mappin.circle.fill")
-                                        .foregroundColor(BusTheme.successGreen)
-                                        .frame(width: 24)
-                                    TextField("Başlangıç (Örn: Ankara)", text: $routeStart)
-                                        .textFieldStyle(.plain)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Image(systemName: "mappin.circle.fill")
+                                            .foregroundColor(BusTheme.successGreen)
+                                            .font(.caption)
+                                        Text("Nereden")
+                                            .font(.caption)
+                                            .foregroundColor(BusTheme.textSecondary)
+                                    }
+                                    
+                                    Picker("Başlangıç", selection: $routeStart) {
+                                        ForEach(cities, id: \.self) { city in
+                                            Text(city).tag(city)
+                                        }
+                                    }
+                                    .pickerStyle(.menu)
+                                    .tint(BusTheme.textPrimary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.vertical, 4)
+                                    .background(BusTheme.backgroundCard)
+                                    .cornerRadius(8)
                                 }
                                 .padding()
                                 .background(BusTheme.backgroundCard)
                                 .cornerRadius(12)
                                 
                                 // Arrow
-                                Image(systemName: "arrow.down")
+                                Image(systemName: "arrow.right")
                                     .foregroundColor(BusTheme.primaryBlue)
                                     .font(.title3)
                                 
                                 // Bitiş
-                                HStack {
-                                    Image(systemName: "mappin.circle.fill")
-                                        .foregroundColor(BusTheme.errorRed)
-                                        .frame(width: 24)
-                                    TextField("Bitiş (Örn: İstanbul)", text: $routeEnd)
-                                        .textFieldStyle(.plain)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Image(systemName: "mappin.circle.fill")
+                                            .foregroundColor(BusTheme.errorRed)
+                                            .font(.caption)
+                                        Text("Nereye")
+                                            .font(.caption)
+                                            .foregroundColor(BusTheme.textSecondary)
+                                    }
+                                    
+                                    Picker("Bitiş", selection: $routeEnd) {
+                                        ForEach(cities, id: \.self) { city in
+                                            Text(city).tag(city)
+                                        }
+                                    }
+                                    .pickerStyle(.menu)
+                                    .tint(BusTheme.textPrimary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.vertical, 4)
+                                    .background(BusTheme.backgroundCard)
+                                    .cornerRadius(8)
                                 }
                                 .padding()
                                 .background(BusTheme.backgroundCard)
@@ -177,14 +224,11 @@ struct StartView: View {
                                 Text("Kalkış Saati")
                                     .foregroundColor(BusTheme.textSecondary)
                                 Spacer()
-                                TextField("Örn: 14:30", text: $tripTime)
-                                    .multilineTextAlignment(.trailing)
-                                    .frame(width: 120)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 8)
-                                    .background(BusTheme.primaryOrange.opacity(0.1))
-                                    .cornerRadius(8)
-                                    .keyboardType(.numbersAndPunctuation)
+                                
+                                DatePicker("", selection: $tripDate, displayedComponents: .hourAndMinute)
+                                    .labelsHidden()
+                                    .colorInvert()
+                                    .colorMultiply(BusTheme.textPrimary)
                             }
                             .padding()
                             .background(BusTheme.backgroundCard)
@@ -273,13 +317,23 @@ struct StartView: View {
             }
             .navigationTitle("Yeni Sefer")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("İptal") {
+                        dismiss()
+                    }
+                    .tint(BusTheme.primaryBlue)
+                }
+            }
             .alert("Hata", isPresented: $showingError) {
                 Button("Tamam", role: .cancel) { }
             } message: {
                 Text(errorMessage)
             }
             .alert("Başarılı", isPresented: $showingSuccess) {
-                Button("Tamam", role: .cancel) { }
+                Button("Tamam", role: .cancel) {
+                    dismiss()
+                }
             } message: {
                 Text("Sefer başarıyla oluşturuldu!")
             }
@@ -299,8 +353,7 @@ struct StartView: View {
     }
     
     private func createTrip() {
-        // Klavye'yi kapat
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        hideKeyboard()
         
         guard let count = Int(seatCount), count > 0 else {
             errorMessage = "Geçerli bir koltuk sayısı giriniz"
@@ -326,6 +379,10 @@ struct StartView: View {
             return
         }
         
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        let timeString = formatter.string(from: tripDate)
+        
         // Sefer oluştur
         viewModel.createTrip(
             vehiclePlate: vehiclePlate.trimmingCharacters(in: .whitespaces).uppercased(),
@@ -333,14 +390,14 @@ struct StartView: View {
             seatCount: count,
             routeStart: routeStart.trimmingCharacters(in: .whitespaces),
             routeEnd: routeEnd.trimmingCharacters(in: .whitespaces),
-            tripTime: tripTime.trimmingCharacters(in: .whitespaces),
+            tripTime: timeString,
             stops: stops
         )
         
         // Başarı mesajı göster
         showingSuccess = true
         
-        // Form'u temizle - yeni sefer oluşturmaya hazır
+        // Form'u temizle
         resetForm()
     }
     
@@ -348,10 +405,14 @@ struct StartView: View {
         vehiclePlate = ""
         seatLayout = "2+1"
         seatCount = ""
-        routeStart = ""
-        routeEnd = ""
-        tripTime = ""
+        routeStart = "İstanbul"
+        routeEnd = "Ankara"
+        tripDate = Date()
         stops = []
+    }
+    
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
@@ -415,7 +476,7 @@ struct AddStopSheetForStart: View {
                     }) {
                         HStack(spacing: 12) {
                             Image(systemName: "checkmark.circle.fill")
-                                .font(.title3)
+                            .font(.title3)
                             Text("Ekle")
                                 .fontWeight(.semibold)
                         }
@@ -442,4 +503,3 @@ struct AddStopSheetForStart: View {
         }
     }
 }
-

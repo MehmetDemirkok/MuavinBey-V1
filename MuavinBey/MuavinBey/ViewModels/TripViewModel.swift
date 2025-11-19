@@ -39,7 +39,8 @@ class TripViewModel: ObservableObject {
             seats: seats,
             createdAt: Date(),
             isActive: false,
-            visitedStops: []
+            visitedStops: [],
+            isCompleted: false
         )
         
         currentTrip = trip
@@ -78,10 +79,11 @@ class TripViewModel: ObservableObject {
             routeEnd: trip.routeEnd,
             tripTime: trip.tripTime,
             stops: trip.stops,
-            seats: trip.seats.map { Seat(number: $0.number, stopId: $0.stopId, isOccupied: false) },
+            seats: trip.seats.map { Seat(number: $0.number, stopId: nil, isOccupied: false) },
             createdAt: Date(),
             isActive: false,
-            visitedStops: []
+            visitedStops: [],
+            isCompleted: false
         )
         saveTripToList(newTrip)
     }
@@ -90,6 +92,7 @@ class TripViewModel: ObservableObject {
     func startTrip(_ trip: Trip) {
         var updatedTrip = trip
         updatedTrip.isActive = true
+        updatedTrip.isCompleted = false
         updatedTrip.visitedStops = []
         updateTrip(updatedTrip)
     }
@@ -118,7 +121,8 @@ class TripViewModel: ObservableObject {
     func endTrip(_ trip: Trip) {
         var updatedTrip = trip
         updatedTrip.isActive = false
-        updatedTrip.visitedStops = []
+        updatedTrip.isCompleted = true
+        updatedTrip.visitedStops = updatedTrip.stops.map { $0.id }
         updateTrip(updatedTrip)
     }
     

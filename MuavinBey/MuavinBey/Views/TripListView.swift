@@ -5,6 +5,7 @@ struct TripListView: View {
     @State private var showingDeleteAlert = false
     @State private var tripToDelete: Trip?
     @State private var showingEditSheet = false
+    @State private var showingStartSheet = false
     @State private var tripToEdit: Trip?
     
     var body: some View {
@@ -79,6 +80,16 @@ struct TripListView: View {
             }
             .navigationTitle("Seferler")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingStartSheet = true
+                    }) {
+                        Image(systemName: "plus")
+                            .fontWeight(.bold)
+                    }
+                }
+            }
             .alert("Seferi Sil", isPresented: $showingDeleteAlert) {
                 Button("İptal", role: .cancel) { }
                 Button("Sil", role: .destructive) {
@@ -95,6 +106,9 @@ struct TripListView: View {
                 if let trip = tripToEdit {
                     EditTripView(viewModel: viewModel, trip: trip)
                 }
+            }
+            .sheet(isPresented: $showingStartSheet) {
+                StartView(viewModel: viewModel)
             }
         }
     }
@@ -121,6 +135,17 @@ struct TripCard: View {
                             Text(trip.vehiclePlate)
                                 .font(.headline)
                                 .foregroundColor(BusTheme.textPrimary)
+                            
+                            if trip.isCompleted {
+                                Text("Tamamlandı")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(BusTheme.successGreen.opacity(0.2))
+                                    .foregroundColor(BusTheme.successGreen)
+                                    .cornerRadius(8)
+                            }
                         }
                         
                         HStack {
@@ -190,15 +215,8 @@ struct TripCard: View {
             
             // Butonlar - NavigationLink dışında
             HStack(spacing: 12) {
-                Button(action: onSelect) {
-                    HStack {
-                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        Text(isSelected ? "Seçili" : "Seç")
-                    }
-                    .font(.subheadline)
-                    .foregroundColor(BusTheme.primaryBlue)
-                }
-                .buttonStyle(BusSecondaryButtonStyle())
+                // Seçili butonu kaldırıldı
+
                 
                 Button(action: onEdit) {
                     HStack {

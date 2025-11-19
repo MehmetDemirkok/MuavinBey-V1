@@ -17,9 +17,9 @@ struct ContentView: View {
                     Label("Seferler", systemImage: "list.bullet.rectangle")
                 }
             
-            StartView(viewModel: tripViewModel)
+            SettingsView()
                 .tabItem {
-                    Label("Yeni Sefer", systemImage: "plus.circle.fill")
+                    Label("Ayarlar", systemImage: "gearshape.fill")
                 }
         }
         .tint(BusTheme.primaryBlue)
