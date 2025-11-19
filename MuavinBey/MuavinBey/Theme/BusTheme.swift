@@ -1,16 +1,42 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Bus Theme Colors
 struct BusTheme {
     // Primary Colors - Otobüs mavisi ve turuncu
-    static let primaryBlue = Color(red: 0.0, green: 0.4, blue: 0.8) // Koyu mavi
-    static let primaryOrange = Color(red: 1.0, green: 0.5, blue: 0.0) // Turuncu
-    static let accentBlue = Color(red: 0.2, green: 0.6, blue: 1.0) // Açık mavi
-    static let accentOrange = Color(red: 1.0, green: 0.7, blue: 0.3) // Açık turuncu
+    static let primaryBlue = Color(uiColor: UIColor { traitCollection in
+        return traitCollection.userInterfaceStyle == .dark ? UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0) : UIColor(red: 0.0, green: 0.4, blue: 0.8, alpha: 1.0)
+    })
+    
+    static let primaryOrange = Color(uiColor: UIColor { traitCollection in
+        return traitCollection.userInterfaceStyle == .dark ? UIColor(red: 1.0, green: 0.6, blue: 0.2, alpha: 1.0) : UIColor(red: 1.0, green: 0.5, blue: 0.0, alpha: 1.0)
+    })
+    
+    static let accentBlue = Color(uiColor: UIColor { traitCollection in
+        return traitCollection.userInterfaceStyle == .dark ? UIColor(red: 0.4, green: 0.7, blue: 1.0, alpha: 1.0) : UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0)
+    })
+    
+    static let accentOrange = Color(uiColor: UIColor { traitCollection in
+        return traitCollection.userInterfaceStyle == .dark ? UIColor(red: 1.0, green: 0.8, blue: 0.4, alpha: 1.0) : UIColor(red: 1.0, green: 0.7, blue: 0.3, alpha: 1.0)
+    })
     
     // Background Colors
-    static let backgroundLight = Color(red: 0.98, green: 0.98, blue: 0.99)
-    static let backgroundCard = Color.white
+    static let backgroundLight = Color(uiColor: UIColor { traitCollection in
+        return traitCollection.userInterfaceStyle == .dark ? .black : UIColor(red: 0.98, green: 0.98, blue: 0.99, alpha: 1.0)
+    })
+    
+    static let backgroundCard = Color(uiColor: UIColor { traitCollection in
+        return traitCollection.userInterfaceStyle == .dark ? UIColor(red: 0.11, green: 0.11, blue: 0.13, alpha: 1.0) : .white
+    })
+    
+    static let inputBackground = Color(uiColor: UIColor { traitCollection in
+        return traitCollection.userInterfaceStyle == .dark ? UIColor(red: 0.18, green: 0.18, blue: 0.2, alpha: 1.0) : UIColor(red: 0.0, green: 0.4, blue: 0.8, alpha: 0.1)
+    })
+    
+    static let inputBackgroundOrange = Color(uiColor: UIColor { traitCollection in
+        return traitCollection.userInterfaceStyle == .dark ? UIColor(red: 0.25, green: 0.15, blue: 0.1, alpha: 1.0) : UIColor(red: 1.0, green: 0.5, blue: 0.0, alpha: 0.1)
+    })
+    
     static let backgroundDark = Color(red: 0.1, green: 0.1, blue: 0.15)
     
     // Text Colors

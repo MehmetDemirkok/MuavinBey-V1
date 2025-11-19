@@ -88,7 +88,7 @@ struct EditTripView: View {
                                         .frame(width: 150)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(BusTheme.primaryBlue.opacity(0.1))
+                                        .background(BusTheme.inputBackground)
                                         .cornerRadius(8)
                                         .autocapitalization(.allCharacters)
                                 }
@@ -128,7 +128,7 @@ struct EditTripView: View {
                                         .frame(width: 100)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(BusTheme.primaryBlue.opacity(0.1))
+                                        .background(BusTheme.inputBackground)
                                         .cornerRadius(8)
                                 }
                                 .padding()
@@ -190,7 +190,7 @@ struct EditTripView: View {
                                     .frame(width: 120)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 8)
-                                    .background(BusTheme.primaryOrange.opacity(0.1))
+                                    .background(BusTheme.inputBackgroundOrange)
                                     .cornerRadius(8)
                                     .keyboardType(.numbersAndPunctuation)
                             }
