@@ -79,3 +79,5 @@ MuavinBey:
 
 **Not:** Bu gizlilik politikası, uygulamanın mevcut sürümü (1.0) için geçerlidir. Gelecekte eklenebilecek özellikler bu politikayı güncelleyebilir.
 
+
+
