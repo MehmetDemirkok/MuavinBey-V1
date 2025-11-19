@@ -314,6 +314,9 @@ struct StartView: View {
                         .padding(.bottom, 30)
                     }
                 }
+                .onTapGesture {
+                    hideKeyboard()
+                }
             }
             .navigationTitle("Yeni Sefer")
             .navigationBarTitleDisplayMode(.inline)
@@ -411,9 +414,7 @@ struct StartView: View {
         stops = []
     }
     
-    private func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
+
 }
 
 struct AddStopSheetForStart: View {
@@ -431,6 +432,9 @@ struct AddStopSheetForStart: View {
                     endPoint: .bottom
                 )
                 .ignoresSafeArea()
+                .onTapGesture {
+                    hideKeyboard()
+                }
                 
                 VStack(spacing: 24) {
                     ZStack {

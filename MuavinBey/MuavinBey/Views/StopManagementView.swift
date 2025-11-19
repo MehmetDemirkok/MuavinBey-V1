@@ -149,6 +149,9 @@ struct AddStopSheet: View {
                     endPoint: .bottom
                 )
                 .ignoresSafeArea()
+                .onTapGesture {
+                    hideKeyboard()
+                }
                 
                 VStack(spacing: 24) {
                     ZStack {

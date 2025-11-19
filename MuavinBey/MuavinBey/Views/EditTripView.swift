@@ -260,8 +260,10 @@ struct EditTripView: View {
                         }
                         .buttonStyle(BusPrimaryButtonStyle(isEnabled: isFormValid))
                         .padding(.horizontal)
-                        .padding(.bottom, 30)
                     }
+                }
+                .onTapGesture {
+                    hideKeyboard()
                 }
             }
             .navigationTitle("Sefer Düzenle")

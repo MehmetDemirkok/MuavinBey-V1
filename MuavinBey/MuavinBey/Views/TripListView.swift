@@ -4,7 +4,7 @@ struct TripListView: View {
     @ObservedObject var viewModel: TripViewModel
     @State private var showingDeleteAlert = false
     @State private var tripToDelete: Trip?
-    @State private var showingEditSheet = false
+
     @State private var showingStartSheet = false
     @State private var tripToEdit: Trip?
     
@@ -61,7 +61,6 @@ struct TripListView: View {
                                     },
                                     onEdit: {
                                         tripToEdit = trip
-                                        showingEditSheet = true
                                     },
                                     onDelete: {
                                         tripToDelete = trip
@@ -102,10 +101,8 @@ struct TripListView: View {
                     Text("'\(trip.routeDescription)' seferini silmek istediğinize emin misiniz?")
                 }
             }
-            .sheet(isPresented: $showingEditSheet) {
-                if let trip = tripToEdit {
-                    EditTripView(viewModel: viewModel, trip: trip)
-                }
+            .sheet(item: $tripToEdit) { trip in
+                EditTripView(viewModel: viewModel, trip: trip)
             }
             .sheet(isPresented: $showingStartSheet) {
                 StartView(viewModel: viewModel)
