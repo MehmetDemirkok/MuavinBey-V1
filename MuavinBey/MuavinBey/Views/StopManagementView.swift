@@ -138,77 +138,122 @@ struct AddStopSheet: View {
     @ObservedObject var viewModel: TripViewModel
     @Binding var stopName: String
     @Environment(\.dismiss) var dismiss
-    @FocusState private var isTextFieldFocused: Bool
+    @State private var searchText = ""
+    @FocusState private var isSearchFocused: Bool
+    
+    var filteredStops: [String] {
+        if searchText.isEmpty {
+            return LocationData.stops
+        } else {
+            return LocationData.stops.filter { $0.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
     
     var body: some View {
         NavigationView {
             ZStack {
-                LinearGradient(
-                    colors: [BusTheme.backgroundLight, BusTheme.primaryOrange.opacity(0.05)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                .onTapGesture {
-                    hideKeyboard()
-                }
+                BusTheme.backgroundLight
+                    .ignoresSafeArea()
                 
-                VStack(spacing: 24) {
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [BusTheme.primaryOrange, BusTheme.accentOrange],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 80, height: 80)
-                            .shadow(color: BusTheme.primaryOrange.opacity(0.3), radius: 12, x: 0, y: 6)
+                VStack(spacing: 0) {
+                    // Search Bar
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(BusTheme.textSecondary)
                         
-                        Image(systemName: "mappin.circle.fill")
-                            .font(.system(size: 40))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.top, 40)
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        BusSectionHeader(title: "Durak Adı")
+                        TextField("Durak veya Otogar Ara...", text: $searchText)
+                            .focused($isSearchFocused)
+                            .textFieldStyle(PlainTextFieldStyle())
                         
-                        TextField("Örn: Esenler Otogar", text: $stopName)
-                            .focused($isTextFieldFocused)
-                            .padding()
-                            .background(BusTheme.backgroundCard)
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(BusTheme.primaryOrange.opacity(0.3), lineWidth: 1)
-                            )
-                    }
-                    .busCard()
-                    .padding(.horizontal)
-                    
-                    Button(action: {
-                        if !stopName.isEmpty {
-                            viewModel.addStop(name: stopName)
-                            stopName = ""
-                            dismiss()
-                        }
-                    }) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.title3)
-                            Text("Kaydet")
-                                .fontWeight(.semibold)
+                        if !searchText.isEmpty {
+                            Button(action: {
+                                searchText = ""
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(BusTheme.textSecondary)
+                            }
                         }
                     }
-                    .buttonStyle(BusPrimaryButtonStyle(isEnabled: !stopName.isEmpty))
-                    .padding(.horizontal)
+                    .padding()
+                    .background(BusTheme.backgroundCard)
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                    .padding()
                     
-                    Spacer()
+                    // List
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            // Custom Add Button
+                            if !searchText.isEmpty {
+                                Button(action: {
+                                    viewModel.addStop(name: searchText)
+                                    stopName = ""
+                                    dismiss()
+                                }) {
+                                    HStack {
+                                        Image(systemName: "plus.circle.fill")
+                                            .foregroundColor(BusTheme.successGreen)
+                                            .font(.title3)
+                                        
+                                        VStack(alignment: .leading) {
+                                            Text("Yeni Ekle: \"\(searchText)\"")
+                                                .foregroundColor(BusTheme.textPrimary)
+                                                .fontWeight(.semibold)
+                                            Text("Listede olmayan bir durak ekle")
+                                                .font(.caption)
+                                                .foregroundColor(BusTheme.textSecondary)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(BusTheme.textSecondary)
+                                            .font(.caption)
+                                    }
+                                    .padding()
+                                    .background(BusTheme.backgroundCard)
+                                }
+                                
+                                Divider()
+                                    .padding(.leading, 50)
+                            }
+                            
+                            ForEach(filteredStops, id: \.self) { stop in
+                                Button(action: {
+                                    viewModel.addStop(name: stop)
+                                    stopName = "" // Reset for next time if needed, though we dismiss
+                                    dismiss()
+                                }) {
+                                    HStack {
+                                        Image(systemName: "mappin.circle.fill")
+                                            .foregroundColor(BusTheme.primaryOrange)
+                                            .font(.title3)
+                                        
+                                        Text(stop)
+                                            .foregroundColor(BusTheme.textPrimary)
+                                            .font(.body)
+                                        
+                                        Spacer()
+                                        
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(BusTheme.textSecondary)
+                                            .font(.caption)
+                                    }
+                                    .padding()
+                                    .background(BusTheme.backgroundCard)
+                                }
+                                
+                                Divider()
+                                    .padding(.leading, 50)
+                            }
+                        }
+                        .background(BusTheme.backgroundCard)
+                        .cornerRadius(12)
+                        .padding(.horizontal)
+                    }
                 }
             }
-            .navigationTitle("Yeni Durak")
+            .navigationTitle("Durak Ekle")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -219,9 +264,8 @@ struct AddStopSheet: View {
                 }
             }
             .onAppear {
-                isTextFieldFocused = true
+                isSearchFocused = true
             }
         }
     }
 }
-
