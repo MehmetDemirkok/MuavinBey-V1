@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @State private var showFeedback = false
     var body: some View {
         NavigationView {
             ZStack {
@@ -53,8 +54,18 @@ struct SettingsView: View {
                         SettingsCard(icon: "person.fill", title: "Geliştirici", content: "Mehmet Demirkök")
                         
                         SettingsCard(icon: "envelope.fill", title: "İletişim", content: "iletisim@muavinbey.com")
+                        
+                        Button(action: {
+                            showFeedback = true
+                        }) {
+                            SettingsCard(icon: "exclamationmark.bubble.fill", title: "Geri Bildirim / Hata Bildir", content: "Görüşlerinizi bizimle paylaşın")
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                     .padding()
+                    .sheet(isPresented: $showFeedback) {
+                        FeedbackView()
+                    }
                     
                     Spacer()
                     
